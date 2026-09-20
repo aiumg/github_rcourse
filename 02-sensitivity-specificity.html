@@ -1,0 +1,1396 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.5.57">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>Sensitivity and Specificity – Diagnostic Test Accuracy</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { display: inline-block; text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+/* CSS for citations */
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+  margin-bottom: 0em;
+}
+.hanging-indent div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
+}
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
+}
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}</style>
+
+
+<script src="site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="site_libs/quarto-nav/headroom.min.js"></script>
+<script src="site_libs/clipboard/clipboard.min.js"></script>
+<script src="site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="site_libs/quarto-search/fuse.min.js"></script>
+<script src="site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="./">
+<link href="./03-predictive-values.html" rel="next">
+<link href="./01-two-by-two.html" rel="prev">
+<link href="./images/favicon.svg" rel="icon" type="image/svg+xml">
+<script src="site_libs/quarto-html/quarto.js"></script>
+<script src="site_libs/quarto-html/popper.min.js"></script>
+<script src="site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="site_libs/quarto-html/anchor.min.js"></script>
+<link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-text-highlighting-styles">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting-dark.css" rel="prefetch" class="quarto-color-scheme quarto-color-alternate" id="quarto-text-highlighting-styles">
+<script src="site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
+<link href="site_libs/bootstrap/bootstrap-dark.min.css" rel="prefetch" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="light">
+<script src="site_libs/quarto-contrib/glightbox/glightbox.min.js"></script>
+<link href="site_libs/quarto-contrib/glightbox/glightbox.min.css" rel="stylesheet">
+<link href="site_libs/quarto-contrib/glightbox/lightbox.css" rel="stylesheet">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+<style>html{ scroll-behavior: smooth; }</style>
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN") {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+<link rel="stylesheet" href="assets/quiz.css">
+</head>
+
+<body class="nav-sidebar docked nav-fixed">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a href="./index.html" class="navbar-brand navbar-brand-logo">
+    <img src="./images/favicon.svg" alt="" class="navbar-logo">
+    </a>
+    <a class="navbar-brand" href="./index.html">
+    <span class="navbar-title">Diagnostic Test Accuracy</span>
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="Search"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll me-auto">
+  <li class="nav-item">
+    <a class="nav-link active" href="./index.html" aria-current="page"> 
+<span class="menu-text">Course</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="./slides/lecture-01.html" target="_blank"> 
+<span class="menu-text">Slides</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="./glossary.html"> 
+<span class="menu-text">Glossary</span></a>
+  </li>  
+</ul>
+            <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item compact">
+    <a class="nav-link" href="./data/chest_pain_cohort.csv"> <i class="bi bi-download" role="img" aria-label="Download the cohort dataset">
+</i> 
+<span class="menu-text"></span></a>
+  </li>  
+</ul>
+          </div> <!-- /navcollapse -->
+            <div class="quarto-navbar-tools">
+  <a href="" class="quarto-color-scheme-toggle quarto-navigation-tool  px-1" onclick="window.quartoToggleColorScheme(); return false;" title="Toggle dark mode"><i class="bi"></i></a>
+  <a href="" class="quarto-reader-toggle quarto-navigation-tool px-1" onclick="window.quartoToggleReader(); return false;" title="Toggle reader mode">
+  <div class="quarto-reader-toggle-btn">
+  <i class="bi"></i>
+  </div>
+</a>
+</div>
+      </div> <!-- /container-fluid -->
+    </nav>
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./01-two-by-two.html">Foundations</a></li><li class="breadcrumb-item"><a href="./02-sensitivity-specificity.html">Sensitivity and Specificity</a></li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+    </div>
+  </nav>
+  <div id="quarto-announcement" data-announcement-id="cc696880e96b4784b2becba2bf611ab0" class="alert alert-primary hidden"><i class="bi bi-info-circle quarto-announcement-icon"></i><div class="quarto-announcement-content">
+<p>Teaching example. The patient data in this course is simulated and must not be used clinically.</p>
+</div><i class="bi bi-x-lg quarto-announcement-action"></i></div>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation docked overflow-auto">
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Diagnostic Test Accuracy</span></a>
+  </div>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true">
+ <span class="menu-text">Foundations</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./01-two-by-two.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">The 2×2 Table</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./02-sensitivity-specificity.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text">Sensitivity and Specificity</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true">
+ <span class="menu-text">Applying the test</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./03-predictive-values.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Predictive Values and Prevalence</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./04-thresholds-roc.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Thresholds and the ROC Curve</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="true">
+ <span class="menu-text">Practice</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./05-case-studies.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Case Studies</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./06-self-assessment.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Self-Assessment</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="true">
+ <span class="menu-text">Reference</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-4" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./glossary.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Glossary</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./references.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">References and Further Reading</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#sec-sensspec" id="toc-sec-sensspec" class="nav-link active" data-scroll-target="#sec-sensspec"><span class="header-section-number">1</span> Two questions, two denominators</a></li>
+  <li><a href="#computing-them" id="toc-computing-them" class="nav-link" data-scroll-target="#computing-them"><span class="header-section-number">2</span> Computing them</a></li>
+  <li><a href="#a-point-estimate-is-not-enough" id="toc-a-point-estimate-is-not-enough" class="nav-link" data-scroll-target="#a-point-estimate-is-not-enough"><span class="header-section-number">3</span> A point estimate is not enough</a></li>
+  <li><a href="#snnout-and-sppin" id="toc-snnout-and-sppin" class="nav-link" data-scroll-target="#snnout-and-sppin"><span class="header-section-number">4</span> SnNout and SpPin</a></li>
+  <li><a href="#why-neither-answers-your-patients-question" id="toc-why-neither-answers-your-patients-question" class="nav-link" data-scroll-target="#why-neither-answers-your-patients-question"><span class="header-section-number">5</span> Why neither answers your patient’s question</a></li>
+  <li><a href="#check-yourself" id="toc-check-yourself" class="nav-link" data-scroll-target="#check-yourself"><span class="header-section-number">6</span> Check yourself</a></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./01-two-by-two.html">Foundations</a></li><li class="breadcrumb-item"><a href="./02-sensitivity-specificity.html">Sensitivity and Specificity</a></li></ol></nav>
+<div class="quarto-title">
+<h1 class="title">Sensitivity and Specificity</h1>
+<p class="subtitle lead">What the test does, independent of who is being tested</p>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<section id="sec-sensspec" class="level2" data-number="1">
+<h2 data-number="1" class="anchored" data-anchor-id="sec-sensspec"><span class="header-section-number">1</span> Two questions, two denominators</h2>
+<div class="objectives">
+<p><strong>In this chapter</strong></p>
+<ul>
+<li>Derive sensitivity and specificity and identify their denominators</li>
+<li>Attach a confidence interval to each and explain why it is often wide</li>
+<li>Use SnNout and SpPin correctly, and know when they mislead</li>
+<li>Explain why these two measures alone cannot interpret a patient’s result</li>
+</ul>
+</div>
+<p>Sensitivity and specificity split the 2×2 table down its columns. Each asks about a group of patients defined by whether they have the disease.</p>
+<p><strong>Sensitivity</strong> asks: among patients who <em>do</em> have the disease, what proportion does the test detect?</p>
+<p><span class="math display">\[
+\text{Sensitivity} = \frac{TP}{TP + FN}
+\]</span></p>
+<p><strong>Specificity</strong> asks: among patients who <em>do not</em> have the disease, what proportion does the test correctly clear?</p>
+<p><span class="math display">\[
+\text{Specificity} = \frac{TN}{TN + FP}
+\]</span></p>
+<p>Both denominators are column totals. Neither involves the number of patients the test called positive, and neither depends on how common the disease is. This is the property that makes them portable between settings — and, as <a href="./03-predictive-values.html">Chapter 3</a> shows, the property that makes them nearly useless at the bedside on their own.</p>
+</section>
+<section id="computing-them" class="level2" data-number="2">
+<h2 data-number="2" class="anchored" data-anchor-id="computing-them"><span class="header-section-number">2</span> Computing them</h2>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>sensitivity <span class="ot">&lt;-</span> tab<span class="sc">$</span>tp <span class="sc">/</span> (tab<span class="sc">$</span>tp <span class="sc">+</span> tab<span class="sc">$</span>fn)</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>specificity <span class="ot">&lt;-</span> tab<span class="sc">$</span>tn <span class="sc">/</span> (tab<span class="sc">$</span>tn <span class="sc">+</span> tab<span class="sc">$</span>fp)</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="fu">c</span>(<span class="at">sensitivity =</span> <span class="fu">round</span>(sensitivity, <span class="dv">3</span>),</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">specificity =</span> <span class="fu">round</span>(specificity, <span class="dv">3</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>sensitivity specificity 
+      0.961       0.717 </code></pre>
+</div>
+</div>
+<p>In our cohort the troponin threshold of 14 ng/L detects 96.1% of confirmed infarctions and correctly clears 71.7% of those without one.</p>
+<div class="callout callout-style-simple callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Sanity check
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>74 true positives divided by 77 patients with confirmed MI gives 0.961. If a calculated sensitivity ever exceeds 1, you have used a row total as the denominator.</p>
+</div>
+</div>
+</section>
+<section id="a-point-estimate-is-not-enough" class="level2" data-number="3">
+<h2 data-number="3" class="anchored" data-anchor-id="a-point-estimate-is-not-enough"><span class="header-section-number">3</span> A point estimate is not enough</h2>
+<p>Both measures are proportions estimated from a sample, so both carry uncertainty. The denominator for sensitivity is only the diseased patients — here 77 of 600 — so the interval around it is usually much wider than the one around specificity.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="annotated-cell-2"><pre class="sourceCode r code-annotation-code code-with-copy code-annotated"><code class="sourceCode r"><a class="code-annotation-anchor" data-target-cell="annotated-cell-2" data-target-annotation="1" onclick="event.preventDefault();">1</a><span id="annotated-cell-2-1" class="code-annotation-target"><a href="#annotated-cell-2-1" aria-hidden="true" tabindex="-1"></a>sens_ci <span class="ot">&lt;-</span> <span class="fu">dtx_ci</span>(tab<span class="sc">$</span>tp, tab<span class="sc">$</span>tp <span class="sc">+</span> tab<span class="sc">$</span>fn)</span>
+<span id="annotated-cell-2-2"><a href="#annotated-cell-2-2" aria-hidden="true" tabindex="-1"></a>spec_ci <span class="ot">&lt;-</span> <span class="fu">dtx_ci</span>(tab<span class="sc">$</span>tn, tab<span class="sc">$</span>tn <span class="sc">+</span> tab<span class="sc">$</span>fp)</span>
+<span id="annotated-cell-2-3"><a href="#annotated-cell-2-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="annotated-cell-2-4"><a href="#annotated-cell-2-4" aria-hidden="true" tabindex="-1"></a><span class="fu">round</span>(<span class="fu">rbind</span>(<span class="at">sensitivity =</span> <span class="fu">c</span>(<span class="at">est =</span> sensitivity, <span class="at">lower =</span> sens_ci[<span class="dv">1</span>], <span class="at">upper =</span> sens_ci[<span class="dv">2</span>]),</span>
+<span id="annotated-cell-2-5"><a href="#annotated-cell-2-5" aria-hidden="true" tabindex="-1"></a>            <span class="at">specificity =</span> <span class="fu">c</span>(<span class="at">est =</span> specificity, <span class="at">lower =</span> spec_ci[<span class="dv">1</span>], <span class="at">upper =</span> spec_ci[<span class="dv">2</span>])), <span class="dv">3</span>)</span><div class="code-annotation-gutter-bg"></div><div class="code-annotation-gutter"></div></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-annotation">
+<dl class="code-annotation-container-grid">
+<dt data-target-cell="annotated-cell-2" data-target-annotation="1">1</dt>
+<dd>
+<span data-code-cell="annotated-cell-2" data-code-lines="1" data-code-annotation="1">Wilson score intervals. Preferred to the normal approximation because these proportions sit close to 1 and the denominators are small — see <span class="citation" data-cites="newman1998interval">(<a href="#ref-newman1998interval" role="doc-biblioref">Newcombe 1998</a>)</span>.</span>
+</dd>
+</dl>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>              est lower upper
+sensitivity 0.961 0.892 0.987
+specificity 0.717 0.677 0.754</code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="cell-output-display">
+<div id="fig-ci" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-ci-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<a href="02-sensitivity-specificity_files/figure-html/fig-ci-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-1" title="Figure&nbsp;1: Point estimates with 95% Wilson intervals. The interval for sensitivity is wider because it rests on far fewer patients."><img src="02-sensitivity-specificity_files/figure-html/fig-ci-1.png" class="img-fluid figure-img" width="672"></a>
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-ci-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;1: Point estimates with 95% Wilson intervals. The interval for sensitivity is wider because it rests on far fewer patients.
+</figcaption>
+</figure>
+</div>
+</div>
+</div>
+<p>Reporting sensitivity as a bare percentage hides this. A test described as “92% sensitive” from a study of 25 diseased patients is compatible with a true sensitivity below 75%.</p>
+</section>
+<section id="snnout-and-sppin" class="level2" data-number="4">
+<h2 data-number="4" class="anchored" data-anchor-id="snnout-and-sppin"><span class="header-section-number">4</span> SnNout and SpPin</h2>
+<p>Two mnemonics from evidence-based medicine, useful when their conditions hold:</p>
+<ul>
+<li><strong>SnNout</strong> — with a highly <strong>Sn</strong>sitive test, a <strong>N</strong>egative result rules the diagnosis <strong>out</strong></li>
+<li><strong>SpPin</strong> — with a highly <strong>Sp</strong>ecific test, a <strong>P</strong>ositive result rules it <strong>in</strong></li>
+</ul>
+<p>The logic is sound. A test that almost never misses the disease produces few false negatives, so a negative result is informative.</p>
+<div class="callout callout-style-default callout-warning callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Where these mnemonics fail
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Both are shortcuts around Bayes’ theorem, and both quietly assume the pre-test probability is not extreme. A 99% sensitive test does not rule out a disease in a patient whose pre-test probability was 90% to begin with — a negative result leaves them well above the threshold at which you would act. Use the mnemonics to build intuition, not to make decisions. <a href="./03-predictive-values.html">Chapter 3</a> gives the arithmetic that always works.</p>
+</div>
+</div>
+</section>
+<section id="why-neither-answers-your-patients-question" class="level2" data-number="5">
+<h2 data-number="5" class="anchored" data-anchor-id="why-neither-answers-your-patients-question"><span class="header-section-number">5</span> Why neither answers your patient’s question</h2>
+<p>Your patient does not ask “if I had an infarction, would this test have caught it?” They ask “I have a positive result — do I have an infarction?”</p>
+<p>That reverses the conditioning. Sensitivity is <span class="math inline">\(P(\text{test}^+ \mid \text{disease})\)</span>; the question asks for <span class="math inline">\(P(\text{disease} \mid \text{test}^+)\)</span>. These are different quantities and confusing them is the <strong>prosecutor’s fallacy</strong> <span class="citation" data-cites="altman1994sensitivity">(<a href="#ref-altman1994sensitivity" role="doc-biblioref">Altman and Bland 1994</a>)</span>.</p>
+<p>In our cohort sensitivity is 96.1%, but the probability that a patient with a positive troponin actually infarcted is 33.3% — a very different number, and it depends on something sensitivity deliberately ignores.</p>
+</section>
+<section id="check-yourself" class="level2" data-number="6">
+<h2 data-number="6" class="anchored" data-anchor-id="check-yourself"><span class="header-section-number">6</span> Check yourself</h2>
+<div class="question">
+<p>A screening test has sensitivity 0.95 and specificity 0.80. It is moved from a hospital population to a community population where the disease is ten times rarer. What happens to the sensitivity?</p>
+<ul class="task-list">
+<li><label><input type="checkbox">It falls, because there are fewer cases to detect</label></li>
+<li><label><input type="checkbox" checked="">It stays approximately the same, provided the spectrum of disease is similar</label></li>
+<li><label><input type="checkbox">It rises, because there are fewer false positives</label></li>
+<li><label><input type="checkbox">It cannot be calculated in the new setting</label></li>
+</ul>
+<div class="feedback">
+<p>Sensitivity is conditional on having the disease, so changing how many people have it does not change the proportion detected. The caveat is real though: if the community cases are <em>milder</em> than the hospital cases, sensitivity can genuinely fall — that is spectrum bias, not a prevalence effect.</p>
+</div>
+</div>
+<div class="question">
+<p>Which single change would most reduce the number of false negatives?</p>
+<ul class="task-list">
+<li><label><input type="checkbox" checked="">Lowering the troponin threshold below 14 ng/L</label></li>
+<li><label><input type="checkbox">Raising the troponin threshold above 14 ng/L</label></li>
+<li><label><input type="checkbox">Testing more patients</label></li>
+<li><label><input type="checkbox">Using a stricter reference standard</label></li>
+</ul>
+<div class="feedback">
+<p>Lowering the threshold calls more patients positive, so fewer diseased patients are missed: sensitivity rises. The price is more false positives and lower specificity. <a href="./04-thresholds-roc.html">Chapter 4</a> traces that trade-off across every possible threshold.</p>
+</div>
+</div>
+
+
+
+</section>
+
+<a onclick="window.scrollTo(0, 0); return false;" role="button" id="quarto-back-to-top"><i class="bi bi-arrow-up"></i> Back to top</a><div id="quarto-appendix" class="default"><section class="quarto-appendix-contents" role="doc-bibliography" id="quarto-bibliography"><h2 class="anchored quarto-appendix-heading">References</h2><div id="refs" class="references csl-bib-body hanging-indent" data-entry-spacing="0" role="list">
+<div id="ref-altman1994sensitivity" class="csl-entry" role="listitem">
+Altman, Douglas G., and J. Martin Bland. 1994. <span>“Diagnostic Tests 1: Sensitivity and Specificity.”</span> <em>BMJ</em> 308 (6943): 1552. <a href="https://doi.org/10.1136/bmj.308.6943.1552">https://doi.org/10.1136/bmj.308.6943.1552</a>.
+</div>
+<div id="ref-newman1998interval" class="csl-entry" role="listitem">
+Newcombe, Robert G. 1998. <span>“Two-Sided Confidence Intervals for the Single Proportion: Comparison of Seven Methods.”</span> <em>Statistics in Medicine</em> 17 (8): 857–72. <a href="https://doi.org/10.1002/(SICI)1097-0258(19980430)17:8<857::AID-SIM777>3.0.CO;2-E">https://doi.org/10.1002/(SICI)1097-0258(19980430)17:8&lt;857::AID-SIM777&gt;3.0.CO;2-E</a>.
+</div>
+</div></section></div></main> <!-- /main -->
+<script>
+/* ---------------------------------------------------------------------------
+   Lightweight self-assessment engine for the Diagnostic Test Accuracy course.
+
+   Authors write plain markdown. Nothing here needs an R package or a server.
+
+   Multiple choice
+   ---------------
+   ::: {.question}
+   Question text goes here.
+
+   - [ ] a wrong option
+   - [x] the correct option
+   - [ ] another wrong option
+
+   ::: {.feedback}
+   Shown after the learner answers.
+   :::
+   :::
+
+   Numeric answer
+   --------------
+   The prevalence is [?]{.fitb answer="0.14" tol="0.01"} .
+--------------------------------------------------------------------------- */
+(function () {
+  "use strict";
+
+  function buildMultipleChoice(block, index) {
+    var list = block.querySelector("ul");
+    if (!list) return null;
+
+    var items = Array.prototype.slice.call(list.querySelectorAll(":scope > li"));
+    if (!items.length) return null;
+
+    var feedbackEl = block.querySelector(".feedback");
+    if (feedbackEl) feedbackEl.classList.add("feedback-hidden");
+
+    var options = items.map(function (li) {
+      var box = li.querySelector('input[type="checkbox"]');
+      var correct = !!(box && box.checked);
+      if (box) box.remove();
+      return { html: li.innerHTML.trim(), correct: correct };
+    });
+
+    if (!options.some(function (o) { return o.correct; })) return null;
+
+    var name = "q" + index + "-" + Math.random().toString(36).slice(2, 7);
+    var wrap = document.createElement("div");
+    wrap.className = "quiz-options";
+
+    options.forEach(function (opt, i) {
+      var id = name + "-" + i;
+      var row = document.createElement("label");
+      row.className = "quiz-option";
+      row.setAttribute("for", id);
+
+      var input = document.createElement("input");
+      input.type = "radio";
+      input.name = name;
+      input.id = id;
+      input.value = String(i);
+
+      var text = document.createElement("span");
+      text.className = "quiz-option-text";
+      text.innerHTML = opt.html;
+
+      var mark = document.createElement("span");
+      mark.className = "quiz-mark";
+      mark.setAttribute("aria-hidden", "true");
+
+      row.appendChild(input);
+      row.appendChild(text);
+      row.appendChild(mark);
+      wrap.appendChild(row);
+    });
+
+    list.replaceWith(wrap);
+
+    var controls = document.createElement("div");
+    controls.className = "quiz-controls";
+
+    var button = document.createElement("button");
+    button.type = "button";
+    button.className = "quiz-check";
+    button.textContent = "Check answer";
+
+    var verdict = document.createElement("span");
+    verdict.className = "quiz-verdict";
+    verdict.setAttribute("role", "status");
+
+    controls.appendChild(button);
+    controls.appendChild(verdict);
+
+    if (feedbackEl) block.insertBefore(controls, feedbackEl);
+    else block.appendChild(controls);
+
+    var answered = false;
+
+    button.addEventListener("click", function () {
+      var picked = wrap.querySelector("input:checked");
+      if (!picked) {
+        verdict.textContent = "Choose an option first.";
+        verdict.className = "quiz-verdict quiz-neutral";
+        return;
+      }
+
+      var chosen = parseInt(picked.value, 10);
+      var isRight = options[chosen].correct;
+
+      Array.prototype.forEach.call(wrap.children, function (row, i) {
+        row.classList.remove("is-correct", "is-wrong");
+        if (options[i].correct) row.classList.add("is-correct");
+        else if (i === chosen) row.classList.add("is-wrong");
+        row.querySelector("input").disabled = true;
+      });
+
+      verdict.textContent = isRight ? "Correct" : "Not correct";
+      verdict.className = "quiz-verdict " + (isRight ? "quiz-right" : "quiz-wrong");
+      button.disabled = true;
+      if (feedbackEl) feedbackEl.classList.remove("feedback-hidden");
+
+      if (!answered) {
+        answered = true;
+        block.dispatchEvent(new CustomEvent("quiz:answered", {
+          bubbles: true,
+          detail: { correct: isRight }
+        }));
+      }
+    });
+
+    return block;
+  }
+
+  function buildFillIn(span) {
+    // Quarto rewrites custom attributes on spans to data-*, so accept either.
+    function attr(name) {
+      return span.getAttribute(name) || span.getAttribute("data-" + name);
+    }
+    var expected = parseFloat(attr("answer"));
+    var tol = parseFloat(attr("tol"));
+    if (isNaN(tol)) tol = 0.01;
+    if (isNaN(expected)) return;
+
+    var holder = document.createElement("span");
+    holder.className = "quiz-fitb";
+
+    var input = document.createElement("input");
+    input.type = "text";
+    input.inputMode = "decimal";
+    input.setAttribute("aria-label", "Your numeric answer");
+    input.size = 7;
+
+    var mark = document.createElement("span");
+    mark.className = "quiz-fitb-mark";
+
+    function grade() {
+      var given = parseFloat(input.value.replace(",", "."));
+      if (isNaN(given)) {
+        holder.className = "quiz-fitb";
+        mark.textContent = "";
+        return;
+      }
+      var ok = Math.abs(given - expected) <= tol;
+      holder.className = "quiz-fitb " + (ok ? "is-correct" : "is-wrong");
+      mark.textContent = ok ? "✓" : "✗";
+    }
+
+    input.addEventListener("change", grade);
+    input.addEventListener("blur", grade);
+
+    holder.appendChild(input);
+    holder.appendChild(mark);
+    span.replaceWith(holder);
+  }
+
+  function attachScoreboard(board, questions) {
+    var total = questions.length;
+    var answered = 0;
+    var right = 0;
+
+    function paint() {
+      board.innerHTML =
+        '<span class="score-count">' + right + " / " + total + "</span>" +
+        '<span class="score-label">' +
+        (answered === 0
+          ? "questions correct — nothing answered yet"
+          : answered < total
+            ? "correct, " + (total - answered) + " still to go"
+            : "correct. All questions answered.") +
+        "</span>";
+    }
+
+    document.addEventListener("quiz:answered", function (e) {
+      answered += 1;
+      if (e.detail.correct) right += 1;
+      paint();
+    });
+
+    paint();
+  }
+
+  function init() {
+    var blocks = document.querySelectorAll("div.question");
+    var live = [];
+    Array.prototype.forEach.call(blocks, function (b, i) {
+      var made = buildMultipleChoice(b, i);
+      if (made) live.push(made);
+    });
+
+    Array.prototype.forEach.call(
+      document.querySelectorAll("span.fitb"),
+      buildFillIn
+    );
+
+    var board = document.querySelector(".quiz-score");
+    if (board && live.length) attachScoreboard(board, live);
+  }
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", init);
+  } else {
+    init();
+  }
+})();
+</script>
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const disableStylesheet = (stylesheets) => {
+    for (let i=0; i < stylesheets.length; i++) {
+      const stylesheet = stylesheets[i];
+      stylesheet.rel = 'prefetch';
+    }
+  }
+  const enableStylesheet = (stylesheets) => {
+    for (let i=0; i < stylesheets.length; i++) {
+      const stylesheet = stylesheets[i];
+      stylesheet.rel = 'stylesheet';
+    }
+  }
+  const manageTransitions = (selector, allowTransitions) => {
+    const els = window.document.querySelectorAll(selector);
+    for (let i=0; i < els.length; i++) {
+      const el = els[i];
+      if (allowTransitions) {
+        el.classList.remove('notransition');
+      } else {
+        el.classList.add('notransition');
+      }
+    }
+  }
+  const toggleGiscusIfUsed = (isAlternate, darkModeDefault) => {
+    const baseTheme = document.querySelector('#giscus-base-theme')?.value ?? 'light';
+    const alternateTheme = document.querySelector('#giscus-alt-theme')?.value ?? 'dark';
+    let newTheme = '';
+    if(darkModeDefault) {
+      newTheme = isAlternate ? baseTheme : alternateTheme;
+    } else {
+      newTheme = isAlternate ? alternateTheme : baseTheme;
+    }
+    const changeGiscusTheme = () => {
+      // From: https://github.com/giscus/giscus/issues/336
+      const sendMessage = (message) => {
+        const iframe = document.querySelector('iframe.giscus-frame');
+        if (!iframe) return;
+        iframe.contentWindow.postMessage({ giscus: message }, 'https://giscus.app');
+      }
+      sendMessage({
+        setConfig: {
+          theme: newTheme
+        }
+      });
+    }
+    const isGiscussLoaded = window.document.querySelector('iframe.giscus-frame') !== null;
+    if (isGiscussLoaded) {
+      changeGiscusTheme();
+    }
+  }
+  const toggleColorMode = (alternate) => {
+    // Switch the stylesheets
+    const alternateStylesheets = window.document.querySelectorAll('link.quarto-color-scheme.quarto-color-alternate');
+    manageTransitions('#quarto-margin-sidebar .nav-link', false);
+    if (alternate) {
+      enableStylesheet(alternateStylesheets);
+      for (const sheetNode of alternateStylesheets) {
+        if (sheetNode.id === "quarto-bootstrap") {
+          toggleBodyColorMode(sheetNode);
+        }
+      }
+    } else {
+      disableStylesheet(alternateStylesheets);
+      toggleBodyColorPrimary();
+    }
+    manageTransitions('#quarto-margin-sidebar .nav-link', true);
+    // Switch the toggles
+    const toggles = window.document.querySelectorAll('.quarto-color-scheme-toggle');
+    for (let i=0; i < toggles.length; i++) {
+      const toggle = toggles[i];
+      if (toggle) {
+        if (alternate) {
+          toggle.classList.add("alternate");     
+        } else {
+          toggle.classList.remove("alternate");
+        }
+      }
+    }
+    // Hack to workaround the fact that safari doesn't
+    // properly recolor the scrollbar when toggling (#1455)
+    if (navigator.userAgent.indexOf('Safari') > 0 && navigator.userAgent.indexOf('Chrome') == -1) {
+      manageTransitions("body", false);
+      window.scrollTo(0, 1);
+      setTimeout(() => {
+        window.scrollTo(0, 0);
+        manageTransitions("body", true);
+      }, 40);  
+    }
+  }
+  const isFileUrl = () => { 
+    return window.location.protocol === 'file:';
+  }
+  const hasAlternateSentinel = () => {  
+    let styleSentinel = getColorSchemeSentinel();
+    if (styleSentinel !== null) {
+      return styleSentinel === "alternate";
+    } else {
+      return false;
+    }
+  }
+  const setStyleSentinel = (alternate) => {
+    const value = alternate ? "alternate" : "default";
+    if (!isFileUrl()) {
+      window.localStorage.setItem("quarto-color-scheme", value);
+    } else {
+      localAlternateSentinel = value;
+    }
+  }
+  const getColorSchemeSentinel = () => {
+    if (!isFileUrl()) {
+      const storageValue = window.localStorage.getItem("quarto-color-scheme");
+      return storageValue != null ? storageValue : localAlternateSentinel;
+    } else {
+      return localAlternateSentinel;
+    }
+  }
+  const darkModeDefault = false;
+  let localAlternateSentinel = darkModeDefault ? 'alternate' : 'default';
+  // Dark / light mode switch
+  window.quartoToggleColorScheme = () => {
+    // Read the current dark / light value 
+    let toAlternate = !hasAlternateSentinel();
+    toggleColorMode(toAlternate);
+    setStyleSentinel(toAlternate);
+    toggleGiscusIfUsed(toAlternate, darkModeDefault);
+  };
+  // Ensure there is a toggle, if there isn't float one in the top right
+  if (window.document.querySelector('.quarto-color-scheme-toggle') === null) {
+    const a = window.document.createElement('a');
+    a.classList.add('top-right');
+    a.classList.add('quarto-color-scheme-toggle');
+    a.href = "";
+    a.onclick = function() { try { window.quartoToggleColorScheme(); } catch {} return false; };
+    const i = window.document.createElement("i");
+    i.classList.add('bi');
+    a.appendChild(i);
+    window.document.body.appendChild(a);
+  }
+  // Switch to dark mode if need be
+  if (hasAlternateSentinel()) {
+    toggleColorMode(true);
+  } else {
+    toggleColorMode(false);
+  }
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const onCopySuccess = function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  }
+  const getTextToCopy = function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+    text: getTextToCopy
+  });
+  clipboard.on('success', onCopySuccess);
+  if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+    // For code content inside modals, clipBoardJS needs to be initialized with a container option
+    // TODO: Check when it could be a function (https://github.com/zenorocha/clipboard.js/issues/860)
+    const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+      text: getTextToCopy,
+      container: window.document.getElementById('quarto-embedded-source-code-modal')
+    });
+    clipboardModal.on('success', onCopySuccess);
+  }
+    var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+    var mailtoRegex = new RegExp(/^mailto:/);
+      var filterRegex = new RegExp("https:\/\/example\.pages\.gwdg\.de\/dtx-course");
+    var isInternal = (href) => {
+        return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+    }
+    // Inspect non-navigation links and adorn them if external
+ 	var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+    for (var i=0; i<links.length; i++) {
+      const link = links[i];
+      if (!isInternal(link.href)) {
+        // undo the damage that might have been done by quarto-nav.js in the case of
+        // links that we want to consider external
+        if (link.dataset.originalHref !== undefined) {
+          link.href = link.dataset.originalHref;
+        }
+      }
+    }
+  function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+    const config = {
+      allowHTML: true,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start',
+    };
+    if (contentFn) {
+      config.content = contentFn;
+    }
+    if (onTriggerFn) {
+      config.onTrigger = onTriggerFn;
+    }
+    if (onUntriggerFn) {
+      config.onUntrigger = onUntriggerFn;
+    }
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      if (note) {
+        return note.innerHTML;
+      } else {
+        return "";
+      }
+    });
+  }
+  const xrefs = window.document.querySelectorAll('a.quarto-xref');
+  const processXRef = (id, note) => {
+    // Strip column container classes
+    const stripColumnClz = (el) => {
+      el.classList.remove("page-full", "page-columns");
+      if (el.children) {
+        for (const child of el.children) {
+          stripColumnClz(child);
+        }
+      }
+    }
+    stripColumnClz(note)
+    if (id === null || id.startsWith('sec-')) {
+      // Special case sections, only their first couple elements
+      const container = document.createElement("div");
+      if (note.children && note.children.length > 2) {
+        container.appendChild(note.children[0].cloneNode(true));
+        for (let i = 1; i < note.children.length; i++) {
+          const child = note.children[i];
+          if (child.tagName === "P" && child.innerText === "") {
+            continue;
+          } else {
+            container.appendChild(child.cloneNode(true));
+            break;
+          }
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(container);
+        }
+        return container.innerHTML
+      } else {
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        return note.innerHTML;
+      }
+    } else {
+      // Remove any anchor links if they are present
+      const anchorLink = note.querySelector('a.anchorjs-link');
+      if (anchorLink) {
+        anchorLink.remove();
+      }
+      if (window.Quarto?.typesetMath) {
+        window.Quarto.typesetMath(note);
+      }
+      // TODO in 1.5, we should make sure this works without a callout special case
+      if (note.classList.contains("callout")) {
+        return note.outerHTML;
+      } else {
+        return note.innerHTML;
+      }
+    }
+  }
+  for (var i=0; i<xrefs.length; i++) {
+    const xref = xrefs[i];
+    tippyHover(xref, undefined, function(instance) {
+      instance.disable();
+      let url = xref.getAttribute('href');
+      let hash = undefined; 
+      if (url.startsWith('#')) {
+        hash = url;
+      } else {
+        try { hash = new URL(url).hash; } catch {}
+      }
+      if (hash) {
+        const id = hash.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note !== null) {
+          try {
+            const html = processXRef(id, note.cloneNode(true));
+            instance.setContent(html);
+          } finally {
+            instance.enable();
+            instance.show();
+          }
+        } else {
+          // See if we can fetch this
+          fetch(url.split('#')[0])
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.getElementById(id);
+            if (note !== null) {
+              const html = processXRef(id, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      } else {
+        // See if we can fetch a full url (with no hash to target)
+        // This is a special case and we should probably do some content thinning / targeting
+        fetch(url)
+        .then(res => res.text())
+        .then(html => {
+          const parser = new DOMParser();
+          const htmlDoc = parser.parseFromString(html, "text/html");
+          const note = htmlDoc.querySelector('main.content');
+          if (note !== null) {
+            // This should only happen for chapter cross references
+            // (since there is no id in the URL)
+            // remove the first header
+            if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+              note.children[0].remove();
+            }
+            const html = processXRef(null, note);
+            instance.setContent(html);
+          } 
+        }).finally(() => {
+          instance.enable();
+          instance.show();
+        });
+      }
+    }, function(instance) {
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            div.style.left = 0;
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+        // Handle positioning of the toggle
+    window.addEventListener(
+      "resize",
+      throttle(() => {
+        elRect = undefined;
+        if (selectedAnnoteEl) {
+          selectCodeLines(selectedAnnoteEl);
+        }
+      }, 10)
+    );
+    function throttle(fn, ms) {
+    let throttle = false;
+    let timer;
+      return (...args) => {
+        if(!throttle) { // first call gets through
+            fn.apply(this, args);
+            throttle = true;
+        } else { // all the others get throttled
+            if(timer) clearTimeout(timer); // cancel #2
+            timer = setTimeout(() => {
+              fn.apply(this, args);
+              timer = throttle = false;
+            }, ms);
+        }
+      };
+    }
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+<nav class="page-navigation">
+  <div class="nav-page nav-page-previous">
+      <a href="./01-two-by-two.html" class="pagination-link" aria-label="The 2×2 Table">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">The 2×2 Table</span>
+      </a>          
+  </div>
+  <div class="nav-page nav-page-next">
+      <a href="./03-predictive-values.html" class="pagination-link" aria-label="Predictive Values and Prevalence">
+        <span class="nav-page-text">Predictive Values and Prevalence</span> <i class="bi bi-arrow-right-short"></i>
+      </a>
+  </div>
+</nav>
+</div> <!-- /content -->
+<footer class="footer">
+  <div class="nav-footer">
+    <div class="nav-footer-left">
+<p>Diagnostic Test Accuracy · CC BY 4.0</p>
+</div>   
+    <div class="nav-footer-center">
+      &nbsp;
+    </div>
+    <div class="nav-footer-right">
+      <ul class="footer-items list-unstyled">
+    <li class="nav-item">
+    <a class="nav-link" href="https://gitlab.gwdg.de/">
+<p>Report an error</p>
+</a>
+  </li>  
+    <li class="nav-item">
+    <a class="nav-link" href="https://gitlab.gwdg.de/">
+<p>Report an error</p>
+</a>
+  </li>  
+</ul>
+    </div>
+  </div>
+</footer>
+<script>var lightboxQuarto = GLightbox({"loop":false,"descPosition":"bottom","openEffect":"zoom","closeEffect":"zoom","selector":".lightbox"});
+(function() {
+  let previousOnload = window.onload;
+  window.onload = () => {
+    if (previousOnload) {
+      previousOnload();
+    }
+    lightboxQuarto.on('slide_before_load', (data) => {
+      const { slideIndex, slideNode, slideConfig, player, trigger } = data;
+      const href = trigger.getAttribute('href');
+      if (href !== null) {
+        const imgEl = window.document.querySelector(`a[href="${href}"] img`);
+        if (imgEl !== null) {
+          const srcAttr = imgEl.getAttribute("src");
+          if (srcAttr && srcAttr.startsWith("data:")) {
+            slideConfig.href = srcAttr;
+          }
+        }
+      } 
+    });
+  
+    lightboxQuarto.on('slide_after_load', (data) => {
+      const { slideIndex, slideNode, slideConfig, player, trigger } = data;
+      if (window.Quarto?.typesetMath) {
+        window.Quarto.typesetMath(slideNode);
+      }
+    });
+  
+  };
+  
+})();
+          </script>
+
+
+
+
+<script src="site_libs/quarto-html/zenscroll-min.js"></script>
+</body></html>

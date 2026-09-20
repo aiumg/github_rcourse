@@ -1,0 +1,141 @@
+/* Self-assessment components.
+   Correct = teal, incorrect = rose: the same colour logic as the 2x2 tables,
+   so the feedback reads as part of the subject matter rather than as chrome. */
+
+div.question {
+  background: #ffffff;
+  border: 1px solid #d2dee0;
+  border-left: 4px solid #12303a;
+  border-radius: 3px;
+  padding: 1.15rem 1.35rem 1rem;
+  margin: 1.75rem 0;
+}
+
+div.question > p:first-child {
+  font-weight: 600;
+  margin-bottom: 0.9rem;
+}
+
+.quiz-options {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  margin-bottom: 0.9rem;
+}
+
+.quiz-option {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.65rem;
+  padding: 0.55rem 0.75rem;
+  border: 1px solid #d2dee0;
+  border-radius: 3px;
+  cursor: pointer;
+  background: #f8fafa;
+}
+
+.quiz-option:hover { border-color: #146b6b; }
+
+.quiz-option input { margin-top: 0.28rem; flex: 0 0 auto; }
+.quiz-option-text { flex: 1 1 auto; }
+.quiz-mark { flex: 0 0 auto; font-weight: 600; }
+
+.quiz-option.is-correct {
+  background: #dcecea;
+  border-color: #146b6b;
+}
+.quiz-option.is-correct .quiz-mark::after {
+  content: "✓";
+  color: #0f5a5a;
+}
+
+.quiz-option.is-wrong {
+  background: #f4e2e0;
+  border-color: #a6423d;
+}
+.quiz-option.is-wrong .quiz-mark::after {
+  content: "✗";
+  color: #8e332f;
+}
+
+.quiz-controls {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+  flex-wrap: wrap;
+}
+
+button.quiz-check {
+  background: #146b6b;
+  color: #fff;
+  border: none;
+  border-radius: 3px;
+  padding: 0.42rem 1rem;
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+}
+button.quiz-check:hover:not(:disabled) { background: #0f5a5a; }
+button.quiz-check:disabled { background: #97acb0; cursor: default; }
+button.quiz-check:focus-visible,
+.quiz-option input:focus-visible,
+.quiz-fitb input:focus-visible {
+  outline: 2px solid #a8700f;
+  outline-offset: 2px;
+}
+
+.quiz-verdict { font-size: 0.9rem; font-weight: 600; }
+.quiz-right   { color: #0f5a5a; }
+.quiz-wrong   { color: #8e332f; }
+.quiz-neutral { color: #56666d; font-weight: 500; }
+
+div.feedback {
+  margin-top: 0.95rem;
+  padding: 0.75rem 1rem;
+  background: #f1f5f6;
+  border-left: 3px solid #146b6b;
+  border-radius: 0 3px 3px 0;
+  font-size: 0.95rem;
+}
+div.feedback.feedback-hidden { display: none; }
+
+/* Inline numeric answers */
+.quiz-fitb { display: inline-flex; align-items: center; gap: 0.3rem; }
+.quiz-fitb input {
+  border: 1px solid #97acb0;
+  border-radius: 3px;
+  padding: 0.12rem 0.4rem;
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 0.9rem;
+}
+.quiz-fitb.is-correct input { border-color: #146b6b; background: #dcecea; }
+.quiz-fitb.is-wrong   input { border-color: #a6423d; background: #f4e2e0; }
+.quiz-fitb-mark { font-weight: 700; }
+.quiz-fitb.is-correct .quiz-fitb-mark { color: #0f5a5a; }
+.quiz-fitb.is-wrong   .quiz-fitb-mark { color: #8e332f; }
+
+/* Running score */
+.quiz-score {
+  display: flex;
+  align-items: baseline;
+  gap: 0.7rem;
+  flex-wrap: wrap;
+  background: #12303a;
+  color: #eaf3f4;
+  padding: 0.9rem 1.25rem;
+  border-radius: 3px;
+  margin: 1.5rem 0;
+}
+.score-count { font-size: 1.6rem; font-weight: 600; font-variant-numeric: tabular-nums; }
+.score-label { font-size: 0.92rem; opacity: 0.85; }
+
+/* Dark mode */
+body.quarto-dark div.question { background: #16262c; border-color: #2a444c; border-left-color: #5bb9ae; }
+body.quarto-dark .quiz-option { background: #101d22; border-color: #2a444c; }
+body.quarto-dark .quiz-option.is-correct { background: #16333a; border-color: #5bb9ae; }
+body.quarto-dark .quiz-option.is-wrong { background: #38201f; border-color: #d98b85; }
+body.quarto-dark .quiz-option.is-correct .quiz-mark::after { color: #7fd3c6; }
+body.quarto-dark .quiz-option.is-wrong .quiz-mark::after { color: #eab3ad; }
+body.quarto-dark div.feedback { background: #16262c; border-left-color: #5bb9ae; }
+body.quarto-dark .quiz-right { color: #7fd3c6; }
+body.quarto-dark .quiz-wrong { color: #eab3ad; }

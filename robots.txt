@@ -1,0 +1,1 @@
+Sitemap: https://example.pages.gwdg.de/dtx-course/sitemap.xml

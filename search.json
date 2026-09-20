@@ -1,0 +1,732 @@
+[
+  {
+    "objectID": "04-thresholds-roc.html",
+    "href": "04-thresholds-roc.html",
+    "title": "Thresholds and the ROC Curve",
+    "section": "",
+    "text": "In this chapter\n\nTrace how sensitivity and specificity move as the cut-off changes\nConstruct and read an ROC curve\nInterpret the area under the curve, and state what it does not tell you\nChoose a threshold from the clinical cost of each error rather than by default\n\n\nChapter 1 imposed a cut-off of 14 ng/L and moved on. That number did more work than any other decision in this course. Change it and every measure changes with it.",
+    "crumbs": [
+      "Course",
+      "Applying the test",
+      "Thresholds and the ROC Curve"
+    ]
+  },
+  {
+    "objectID": "04-thresholds-roc.html#sec-roc",
+    "href": "04-thresholds-roc.html#sec-roc",
+    "title": "Thresholds and the ROC Curve",
+    "section": "",
+    "text": "In this chapter\n\nTrace how sensitivity and specificity move as the cut-off changes\nConstruct and read an ROC curve\nInterpret the area under the curve, and state what it does not tell you\nChoose a threshold from the clinical cost of each error rather than by default\n\n\nChapter 1 imposed a cut-off of 14 ng/L and moved on. That number did more work than any other decision in this course. Change it and every measure changes with it.",
+    "crumbs": [
+      "Course",
+      "Applying the test",
+      "Thresholds and the ROC Curve"
+    ]
+  },
+  {
+    "objectID": "04-thresholds-roc.html#two-overlapping-distributions",
+    "href": "04-thresholds-roc.html#two-overlapping-distributions",
+    "title": "Thresholds and the ROC Curve",
+    "section": "2 Two overlapping distributions",
+    "text": "2 Two overlapping distributions\nThe reason a perfect threshold does not exist is visible in the raw data. Patients with and without infarction have different troponin distributions — but the distributions overlap.\n\n\n\n\n\n\n\n\nFigure 1: Troponin on a log scale, by final diagnosis. Any vertical line drawn through this figure cuts through both distributions: some diseased patients fall to its left, some healthy patients to its right.\n\n\n\n\n\n\n\n\n\n\n\nWhy overlap is unavoidable\n\n\n\nIf the two distributions separated cleanly, a threshold in the gap would give 100% sensitivity and 100% specificity, and diagnosis would be a solved problem. Biological variation, assay imprecision and heterogeneous disease guarantee the overlap. Choosing a threshold means choosing where in the overlap to stand.",
+    "crumbs": [
+      "Course",
+      "Applying the test",
+      "Thresholds and the ROC Curve"
+    ]
+  },
+  {
+    "objectID": "04-thresholds-roc.html#sweeping-the-cut-off",
+    "href": "04-thresholds-roc.html#sweeping-the-cut-off",
+    "title": "Thresholds and the ROC Curve",
+    "section": "3 Sweeping the cut-off",
+    "text": "3 Sweeping the cut-off\n\ncutoffs &lt;- c(5, 10, 14, 20, 30, 50, 100)\n\nsweep &lt;- t(sapply(cutoffs, function(k) {\n  tk &lt;- dtx_table(cohort$troponin_ng_L &gt;= k, cohort$mi_confirmed)\n  mk &lt;- dtx_measures(tk)\n  c(cutoff = k, TP = tk$tp, FP = tk$fp, FN = tk$fn, TN = tk$tn,\n    sensitivity = round(mk$sensitivity, 3),\n    specificity = round(mk$specificity, 3),\n    PPV = round(mk$ppv, 3))\n}))\n\n\n\n\n\nTable 1: The same patients, the same assay, seven different tests. Note that sensitivity and specificity always move in opposite directions.\n\n\n\n\n\n\ncutoff\nTP\nFP\nFN\nTN\nsensitivity\nspecificity\nPPV\n\n\n\n\n5\n77\n412\n0\n111\n1.000\n0.212\n0.157\n\n\n10\n77\n243\n0\n280\n1.000\n0.535\n0.241\n\n\n14\n74\n148\n3\n375\n0.961\n0.717\n0.333\n\n\n20\n71\n80\n6\n443\n0.922\n0.847\n0.470\n\n\n30\n59\n37\n18\n486\n0.766\n0.929\n0.615\n\n\n50\n48\n8\n29\n515\n0.623\n0.985\n0.857\n\n\n100\n13\n1\n64\n522\n0.169\n0.998\n0.929\n\n\n\n\n\n\n\n\nRead the sensitivity and specificity columns against each other. There is no row where both improve. That constraint is what the ROC curve draws.",
+    "crumbs": [
+      "Course",
+      "Applying the test",
+      "Thresholds and the ROC Curve"
+    ]
+  },
+  {
+    "objectID": "04-thresholds-roc.html#the-roc-curve",
+    "href": "04-thresholds-roc.html#the-roc-curve",
+    "title": "Thresholds and the ROC Curve",
+    "section": "4 The ROC curve",
+    "text": "4 The ROC curve\nPlot the true positive rate against the false positive rate at every possible cut-off, and you get the receiver operating characteristic curve.\n\n\n\n\n\n\n\n\nFigure 2: Empirical ROC curve for troponin. Each point is one possible threshold. The diagonal is what an uninformative test would produce.\n\n\n\n\n\nThe curve is a summary of the whole family of tests you could build from one measurement. Moving along it towards the upper right buys sensitivity with specificity; moving down-left does the reverse.",
+    "crumbs": [
+      "Course",
+      "Applying the test",
+      "Thresholds and the ROC Curve"
+    ]
+  },
+  {
+    "objectID": "04-thresholds-roc.html#area-under-the-curve",
+    "href": "04-thresholds-roc.html#area-under-the-curve",
+    "title": "Thresholds and the ROC Curve",
+    "section": "5 Area under the curve",
+    "text": "5 Area under the curve\n\nroc &lt;- dtx_roc(cohort$troponin_ng_L, cohort$mi_confirmed)\nauc &lt;- dtx_auc(roc)\nround(auc, 3)\n\n[1] 0.953\n\n\nThe AUC here is 0.953. Its interpretation is specific and often misquoted: it is the probability that a randomly chosen diseased patient has a higher test value than a randomly chosen patient without the disease (Hanley and McNeil 1982).\n\n\n\n\n\n\nWhat AUC does not tell you\n\n\n\n\nIt is not accuracy. It is threshold-independent, so it says nothing about how the test performs at the cut-off you will actually use.\nIt ignores clinical cost. Two tests with identical AUC can differ completely in the region of the curve that matters for your decision.\nIt ignores prevalence. A test with an excellent AUC can still have a hopeless PPV in a low-prevalence setting, as Chapter 3 showed.\n\nReport the AUC. Then report sensitivity, specificity and predictive values at the threshold you intend to use, which is the number a clinician can act on.",
+    "crumbs": [
+      "Course",
+      "Applying the test",
+      "Thresholds and the ROC Curve"
+    ]
+  },
+  {
+    "objectID": "04-thresholds-roc.html#choosing-a-threshold-honestly",
+    "href": "04-thresholds-roc.html#choosing-a-threshold-honestly",
+    "title": "Thresholds and the ROC Curve",
+    "section": "6 Choosing a threshold honestly",
+    "text": "6 Choosing a threshold honestly\nThe Youden index (\\(J = \\text{sensitivity} + \\text{specificity} - 1\\)) picks the point furthest above the diagonal.\n\nyouden &lt;- sapply(sort(unique(cohort$troponin_ng_L)), function(k) {\n  mk &lt;- dtx_measures(dtx_table(cohort$troponin_ng_L &gt;= k, cohort$mi_confirmed))\n  mk$sensitivity + mk$specificity - 1\n})\nbest &lt;- sort(unique(cohort$troponin_ng_L))[which.max(youden)]\nbest\n\n[1] 21.9\n\n\nYouden treats a false negative and a false positive as equally bad. In acute coronary syndrome they are not remotely equal: a missed infarction may be fatal, while a false positive costs an admission and an angiogram. Weight the errors and the optimum moves.\n\n\n\n\n\n\n\n\nFigure 3: Expected cost across candidate thresholds under three assumptions about how much worse a missed infarction is than a false alarm. The optimum shifts markedly to the left as the penalty for missing disease rises.\n\n\n\n\n\n\nThe rule-out strategy\nThis is why emergency departments run troponin as a rule-out test with a low threshold, accepting many false positives to drive false negatives towards zero. The threshold encodes a value judgement about which error the department is willing to make. Making that judgement explicit is better practice than inheriting a cut-off from the assay insert.",
+    "crumbs": [
+      "Course",
+      "Applying the test",
+      "Thresholds and the ROC Curve"
+    ]
+  },
+  {
+    "objectID": "04-thresholds-roc.html#check-yourself",
+    "href": "04-thresholds-roc.html#check-yourself",
+    "title": "Thresholds and the ROC Curve",
+    "section": "7 Check yourself",
+    "text": "7 Check yourself\n\nTest A has an AUC of 0.91; test B has an AUC of 0.88. Which conclusion is justified?\n\nTest A is the better choice for this clinical problem\nTest A is more accurate at every threshold\nTest A discriminates better on average, but B may still be preferable at the threshold you need\nTest A has a higher positive predictive value\n\n\nAUC averages across all thresholds. ROC curves can cross, so test B may well dominate in the high-sensitivity region where a rule-out test operates. And neither AUC says anything about predictive value, which depends on prevalence.\n\n\n\nYou lower the troponin threshold from 14 ng/L to 5 ng/L. Which pair of changes follows necessarily?\n\nSensitivity rises and specificity rises\nSensitivity rises and specificity falls\nSensitivity falls and specificity rises\nSensitivity is unchanged and PPV rises\n\n\nA lower threshold calls more patients positive. More diseased patients are caught, so sensitivity rises; more healthy patients are wrongly flagged, so specificity falls. Compare the rows for 5 and 14 in the sweep table above and you can watch it happen.",
+    "crumbs": [
+      "Course",
+      "Applying the test",
+      "Thresholds and the ROC Curve"
+    ]
+  },
+  {
+    "objectID": "03-predictive-values.html",
+    "href": "03-predictive-values.html",
+    "title": "Predictive Values and Prevalence",
+    "section": "",
+    "text": "In this chapter\n\nCalculate positive and negative predictive value\nShow how both change with prevalence while sensitivity and specificity do not\nApply Bayes’ theorem using likelihood ratios\nExplain why a good test can still produce mostly false alarms\n\n\nChapter 2 read the table down its columns. Predictive values read it across the rows — starting from the result the patient actually has.\n\\[\n\\text{PPV} = \\frac{TP}{TP + FP}\n\\qquad\\qquad\n\\text{NPV} = \\frac{TN}{TN + FN}\n\\]\n\nppv &lt;- tab$tp / (tab$tp + tab$fp)\nnpv &lt;- tab$tn / (tab$tn + tab$fn)\n\nc(ppv = round(ppv, 3), npv = round(npv, 3))\n\n  ppv   npv \n0.333 0.992 \n\n\nIn our cohort, a positive troponin carries a 33.3% probability of a confirmed infarction, and a negative one leaves a 0.8% residual probability.",
+    "crumbs": [
+      "Course",
+      "Applying the test",
+      "Predictive Values and Prevalence"
+    ]
+  },
+  {
+    "objectID": "03-predictive-values.html#sec-prevalence",
+    "href": "03-predictive-values.html#sec-prevalence",
+    "title": "Predictive Values and Prevalence",
+    "section": "",
+    "text": "In this chapter\n\nCalculate positive and negative predictive value\nShow how both change with prevalence while sensitivity and specificity do not\nApply Bayes’ theorem using likelihood ratios\nExplain why a good test can still produce mostly false alarms\n\n\nChapter 2 read the table down its columns. Predictive values read it across the rows — starting from the result the patient actually has.\n\\[\n\\text{PPV} = \\frac{TP}{TP + FP}\n\\qquad\\qquad\n\\text{NPV} = \\frac{TN}{TN + FN}\n\\]\n\nppv &lt;- tab$tp / (tab$tp + tab$fp)\nnpv &lt;- tab$tn / (tab$tn + tab$fn)\n\nc(ppv = round(ppv, 3), npv = round(npv, 3))\n\n  ppv   npv \n0.333 0.992 \n\n\nIn our cohort, a positive troponin carries a 33.3% probability of a confirmed infarction, and a negative one leaves a 0.8% residual probability.",
+    "crumbs": [
+      "Course",
+      "Applying the test",
+      "Predictive Values and Prevalence"
+    ]
+  },
+  {
+    "objectID": "03-predictive-values.html#the-prevalence-trap",
+    "href": "03-predictive-values.html#the-prevalence-trap",
+    "title": "Predictive Values and Prevalence",
+    "section": "2 The prevalence trap",
+    "text": "2 The prevalence trap\nHere is the result that surprises people. Hold the test constant — same assay, same threshold, same sensitivity of 96.1% and specificity of 71.7% — and vary only how common the disease is.\n\n\n\n\n\n\n\n\nFigure 1: Predictive values across the plausible range of prevalence, with the test itself held fixed. The dashed line marks our cohort. PPV collapses as disease becomes rare; NPV barely moves.\n\n\n\n\n\n\n\n\n\nTable 1: The identical test deployed in four settings. Only the population changes.\n\n\n\n\n\n\n\n\n\n\n\n\n\nSetting\nPrevalence\nPPV\nNPV\nFalse alarms per true case\n\n\n\n\nPopulation screening\n0.2%\n0.7%\n100.0%\n146.9\n\n\nPrimary care chest pain\n2.0%\n6.5%\n99.9%\n14.4\n\n\nEmergency department\n13.0%\n33.7%\n99.2%\n2.0\n\n\nCoronary care unit\n45.0%\n73.5%\n95.7%\n0.4\n\n\n\n\n\n\n\n\nApplied as a population screen, this same test produces roughly 147 false alarms for every genuine case found. Nothing about the assay has deteriorated. The test is fine; the deployment is wrong.\n\nThe clinical consequence\nThis is the argument against unfocused testing. Ordering a troponin on a patient with a very low pre-test probability does not produce information — it produces a result that is more likely to be wrong than right, along with the admission, the anticoagulation and the angiogram that follow from it.",
+    "crumbs": [
+      "Course",
+      "Applying the test",
+      "Predictive Values and Prevalence"
+    ]
+  },
+  {
+    "objectID": "03-predictive-values.html#work-it-out-yourself",
+    "href": "03-predictive-values.html#work-it-out-yourself",
+    "title": "Predictive Values and Prevalence",
+    "section": "3 Work it out yourself",
+    "text": "3 Work it out yourself\nMove the sliders. Sensitivity and specificity start at the values from our cohort. The numbers recompute in your browser as you drag.\n\nviewof prevalence = Inputs.range([0.001, 0.6], {\n  value: 0.13, step: 0.001, label: \"Prevalence (pre-test probability)\"\n})\nviewof sensitivity = Inputs.range([0.5, 1], {\n  value: sens_in, step: 0.005, label: \"Sensitivity\"\n})\nviewof specificity = Inputs.range([0.5, 1], {\n  value: spec_in, step: 0.005, label: \"Specificity\"\n})\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\ncohortSize = 10000\ndiseased = cohortSize * prevalence\ntp = diseased * sensitivity\nfn = diseased - tp\ntn = (cohortSize - diseased) * specificity\nfp = (cohortSize - diseased) - tn\nppv_live = tp / (tp + fp)\nnpv_live = tn / (tn + fn)\nlrPos = sensitivity / (1 - specificity)\nlrNeg = (1 - sensitivity) / specificity\nfmt = (x) =&gt; (100 * x).toFixed(1) + \"%\"\nn = (x) =&gt; Math.round(x).toLocaleString(\"en\")\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nhtml`&lt;table class=\"dtx-2x2\"&gt;\n  &lt;thead&gt;&lt;tr&gt;&lt;th&gt;&lt;/th&gt;&lt;th&gt;Disease present&lt;/th&gt;&lt;th&gt;Disease absent&lt;/th&gt;&lt;th&gt;Total&lt;/th&gt;&lt;/tr&gt;&lt;/thead&gt;\n  &lt;tbody&gt;\n    &lt;tr&gt;&lt;th&gt;Test positive&lt;/th&gt;\n      &lt;td class=\"hit\"&gt;${n(tp)}&lt;span class=\"cell-label\"&gt;true positive&lt;/span&gt;&lt;/td&gt;\n      &lt;td class=\"miss\"&gt;${n(fp)}&lt;span class=\"cell-label\"&gt;false positive&lt;/span&gt;&lt;/td&gt;\n      &lt;td&gt;${n(tp + fp)}&lt;/td&gt;&lt;/tr&gt;\n    &lt;tr&gt;&lt;th&gt;Test negative&lt;/th&gt;\n      &lt;td class=\"miss\"&gt;${n(fn)}&lt;span class=\"cell-label\"&gt;false negative&lt;/span&gt;&lt;/td&gt;\n      &lt;td class=\"hit\"&gt;${n(tn)}&lt;span class=\"cell-label\"&gt;true negative&lt;/span&gt;&lt;/td&gt;\n      &lt;td&gt;${n(fn + tn)}&lt;/td&gt;&lt;/tr&gt;\n    &lt;tr&gt;&lt;th&gt;Total&lt;/th&gt;&lt;td&gt;${n(diseased)}&lt;/td&gt;&lt;td&gt;${n(cohortSize - diseased)}&lt;/td&gt;&lt;td&gt;${n(cohortSize)}&lt;/td&gt;&lt;/tr&gt;\n  &lt;/tbody&gt;\n&lt;/table&gt;\n&lt;p style=\"text-align:center; font-family: 'IBM Plex Sans', sans-serif; line-height:1.9\"&gt;\n  &lt;strong&gt;PPV ${fmt(ppv_live)}&lt;/strong&gt; &nbsp;·&nbsp;\n  &lt;strong&gt;NPV ${fmt(npv_live)}&lt;/strong&gt;&lt;br&gt;\n  &lt;span style=\"font-size:0.9em; opacity:0.8\"&gt;\n    positive likelihood ratio ${lrPos.toFixed(1)} &nbsp;·&nbsp;\n    negative likelihood ratio ${lrNeg.toFixed(2)}\n  &lt;/span&gt;\n&lt;/p&gt;`\n\n\n\n\n\n\nDrag prevalence down towards 1% while leaving the test untouched, and watch PPV fall away. That single behaviour explains most of the controversy around population screening programmes.",
+    "crumbs": [
+      "Course",
+      "Applying the test",
+      "Predictive Values and Prevalence"
+    ]
+  },
+  {
+    "objectID": "03-predictive-values.html#likelihood-ratios-the-portable-version",
+    "href": "03-predictive-values.html#likelihood-ratios-the-portable-version",
+    "title": "Predictive Values and Prevalence",
+    "section": "4 Likelihood ratios: the portable version",
+    "text": "4 Likelihood ratios: the portable version\nPredictive values are specific to the population they were measured in, which makes them awkward to carry between settings. Likelihood ratios solve this. They describe the test, like sensitivity and specificity, but combine directly with any pre-test probability (Deeks and Altman 2004).\n\\[\nLR^+ = \\frac{\\text{Sensitivity}}{1 - \\text{Specificity}}\n\\qquad\\qquad\nLR^- = \\frac{1 - \\text{Sensitivity}}{\\text{Specificity}}\n\\]\n\nlr_pos &lt;- sn / (1 - sp)\nlr_neg &lt;- (1 - sn) / sp\nc(LR_positive = round(lr_pos, 2), LR_negative = round(lr_neg, 3))\n\nLR_positive LR_negative \n      3.400       0.054 \n\n\nApply them in odds, then convert back:\n\\[\n\\text{post-test odds} = \\text{pre-test odds} \\times LR\n\\]\n\n1pre  &lt;- 0.13\n2odds_pre  &lt;- pre / (1 - pre)\n3odds_post &lt;- odds_pre * lr_pos\n4post &lt;- odds_post / (1 + odds_post)\n\nround(c(pre_test = pre, post_test = post), 3)\n\n\n1\n\nYour clinical estimate before the test — from history, examination and setting.\n\n2\n\nProbability converted to odds.\n\n3\n\nThe only step that uses the test result.\n\n4\n\nOdds converted back to a probability.\n\n\n\n\n pre_test post_test \n    0.130     0.337 \n\n\n\n\n\n\nTable 2: Rough interpretation of likelihood ratio magnitudes.\n\n\n\n\n\n\nPositive LR\nNegative LR\nInterpretation\n\n\n\n\n&gt; 10\n&lt; 0.1\nLarge, often conclusive shift\n\n\n5 - 10\n0.1 - 0.2\nModerate shift\n\n\n2 - 5\n0.2 - 0.5\nSmall but sometimes useful shift\n\n\n1 - 2\n0.5 - 1\nRarely changes management",
+    "crumbs": [
+      "Course",
+      "Applying the test",
+      "Predictive Values and Prevalence"
+    ]
+  },
+  {
+    "objectID": "03-predictive-values.html#check-yourself",
+    "href": "03-predictive-values.html#check-yourself",
+    "title": "Predictive Values and Prevalence",
+    "section": "5 Check yourself",
+    "text": "5 Check yourself\n\nA test with sensitivity 0.99 and specificity 0.99 is used to screen for a condition affecting 1 in 10,000 people. A patient tests positive. Roughly what is the probability they have the condition?\n\nAbout 99%\nAbout 50%\nAbout 1%\nAbout 0.01%\n\n\nIn 1,000,000 people: 100 have the condition and 99 test positive. Of the 999,900 without it, about 9,999 test positive. So 99 out of roughly 10,098 positives are genuine — about 1%. An excellent test, applied to a rare condition, still yields a hundred false alarms per true case. Set the slider above to 0.0001 and watch it happen.\n\n\n\nA patient’s pre-test probability is 20%. A test with a positive likelihood ratio of 8 comes back positive. The post-test probability is closest to:\n\n28%\n40%\n67%\n80%\n\n\nPre-test odds = 0.2/0.8 = 0.25. Post-test odds = 0.25 × 8 = 2. Probability = 2/(1+2) = 0.67. Note that you cannot simply multiply the probability by the likelihood ratio — 20% × 8 would give 160%, which is why the conversion to odds is not optional.",
+    "crumbs": [
+      "Course",
+      "Applying the test",
+      "Predictive Values and Prevalence"
+    ]
+  },
+  {
+    "objectID": "05-case-studies.html",
+    "href": "05-case-studies.html",
+    "title": "Case Studies",
+    "section": "",
+    "text": "In this chapter\n\nApply likelihood ratios to individual patients with different pre-test probabilities\nRecognise when a test result should not change management\nCheck whether accuracy holds up in clinically relevant subgroups\nEverything so far has described populations. Clinical work happens one patient at a time. These three attend the same department on the same evening and all have their troponin measured with the same assay, whose likelihood ratios we established in Chapter 3:\nPositive LR = 3.4    Negative LR = 0.054",
+    "crumbs": [
+      "Course",
+      "Practice",
+      "Case Studies"
+    ]
+  },
+  {
+    "objectID": "05-case-studies.html#does-accuracy-hold-in-every-subgroup",
+    "href": "05-case-studies.html#does-accuracy-hold-in-every-subgroup",
+    "title": "Case Studies",
+    "section": "1 Does accuracy hold in every subgroup?",
+    "text": "1 Does accuracy hold in every subgroup?\nSensitivity and specificity are stable across prevalence, but not necessarily across case mix. Worth checking directly.\n\nsubgroup &lt;- function(rows, label) {\n  d &lt;- cohort[rows, ]\n  t &lt;- dtx_table(d$test_positive, d$mi_confirmed)\n  s &lt;- dtx_measures(t)\n  data.frame(Subgroup = label, n = t$n,\n             Prevalence = pct(s$prevalence),\n             Sensitivity = pct(s$sensitivity),\n             Specificity = pct(s$specificity),\n             PPV = pct(s$ppv))\n}\n\nresults &lt;- rbind(\n  subgroup(rep(TRUE, nrow(cohort)),          \"All patients\"),\n  subgroup(cohort$sex == \"F\",                \"Women\"),\n  subgroup(cohort$sex == \"M\",                \"Men\"),\n  subgroup(cohort$hours_since_onset &lt; 3,     \"Presenting &lt; 3 h\"),\n  subgroup(cohort$hours_since_onset &gt;= 3,    \"Presenting &gt;= 3 h\"),\n  subgroup(cohort$age &lt; 60,                  \"Age under 60\"),\n  subgroup(cohort$age &gt;= 60,                 \"Age 60 and over\")\n)\n\n\n\n\n\nTable 1: Accuracy by subgroup. Prevalence varies substantially between groups; sensitivity and specificity should not, and here they broadly do not.\n\n\n\n\n\n\nSubgroup\nn\nPrevalence\nSensitivity\nSpecificity\nPPV\n\n\n\n\nAll patients\n600\n12.8%\n96.1%\n71.7%\n33.3%\n\n\nWomen\n277\n12.6%\n94.3%\n71.9%\n32.7%\n\n\nMen\n323\n13.0%\n97.6%\n71.5%\n33.9%\n\n\nPresenting &lt; 3 h\n127\n15.0%\n100.0%\n70.4%\n37.3%\n\n\nPresenting &gt;= 3 h\n473\n12.3%\n94.8%\n72.0%\n32.2%\n\n\nAge under 60\n259\n12.4%\n90.6%\n76.7%\n35.4%\n\n\nAge 60 and over\n341\n13.2%\n100.0%\n67.9%\n32.1%\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nHow to read this table\n\n\n\n\n\nLook across the prevalence column, then across sensitivity and specificity. The prevalence differences do not drag sensitivity and specificity with them — that is the independence from Chapter 2, visible in real numbers. PPV, by contrast, tracks prevalence closely.\nWhere sensitivity does differ between subgroups, suspect a genuine biological difference in the test’s behaviour rather than a prevalence effect. Early presentation is the classic example: troponin needs time to rise, so tests taken within a few hours of symptom onset genuinely miss more infarctions. Small subgroups also produce unstable estimates, so check the denominators before concluding anything.",
+    "crumbs": [
+      "Course",
+      "Practice",
+      "Case Studies"
+    ]
+  },
+  {
+    "objectID": "05-case-studies.html#adding-your-own-media",
+    "href": "05-case-studies.html#adding-your-own-media",
+    "title": "Case Studies",
+    "section": "2 Adding your own media",
+    "text": "2 Adding your own media\nCourse pages can carry video alongside the analysis. The shortcode takes any video URL or a local file:\n{{&lt; video https://www.youtube.com/embed/VIDEO_ID\n    title=\"Interpreting troponin in the emergency department\"\n    aspect-ratio=\"16x9\" &gt;}}\nImages work the same way, and clicking one opens it full-screen because lightbox: true is set in _quarto.yml:\n![Coronary anatomy](images/anatomy.png){group=\"atlas\"}\nEvery figure in this course is already clickable — try the ROC curve in Chapter 4.",
+    "crumbs": [
+      "Course",
+      "Practice",
+      "Case Studies"
+    ]
+  },
+  {
+    "objectID": "05-case-studies.html#check-yourself",
+    "href": "05-case-studies.html#check-yourself",
+    "title": "Case Studies",
+    "section": "3 Check yourself",
+    "text": "3 Check yourself\n\nCase C has a pre-test probability of 95% and a negative troponin. What is the correct action?\n\nDischarge him, since the test was negative\nRepeat the troponin in six hours before deciding\nProceed to reperfusion on the basis of the ECG and history\nOrder a d-dimer instead\n\n\nHis post-test probability remains around 80%, far above any threshold for treatment, and troponin may not yet have risen in an infarct of 40 minutes’ duration. A test that cannot move the patient across a decision threshold should not delay treatment.\n\n\n\nIn the subgroup table, PPV differs markedly between women and men while sensitivity is similar. The most likely explanation is:\n\nThe assay performs less well in women\nThe prevalence of confirmed infarction differs between the two groups\nThe reference standard was applied inconsistently\nThe sample size is too small to interpret\n\n\nPPV depends on prevalence; sensitivity does not. When sensitivity and specificity are stable but PPV moves, prevalence is the first explanation to consider. A genuine difference in assay performance would show up in sensitivity or specificity as well.",
+    "crumbs": [
+      "Course",
+      "Practice",
+      "Case Studies"
+    ]
+  },
+  {
+    "objectID": "slides/lecture-01.html#the-clinical-question",
+    "href": "slides/lecture-01.html#the-clinical-question",
+    "title": "Diagnostic Test Accuracy",
+    "section": "The clinical question",
+    "text": "The clinical question\nA 58-year-old man. Chest pain. Troponin 22 ng/L, above the cut-off.\n\nDoes he have a myocardial infarction?\n\n\nThe test does not answer this. It shifts a probability.\nHow far, and from where, is the whole subject."
+  },
+  {
+    "objectID": "slides/lecture-01.html#everything-comes-from-one-table",
+    "href": "slides/lecture-01.html#everything-comes-from-one-table",
+    "title": "Diagnostic Test Accuracy",
+    "section": "Everything comes from one table",
+    "text": "Everything comes from one table\n\n\n\n\n\n\nMI confirmed\n\n\nMI excluded\n\n\nTotal\n\n\n\n\n\n\nTest positive\n\n\n74true positive\n\n\n148false positive\n\n\n222\n\n\n\n\nTest negative\n\n\n3false negative\n\n\n375true negative\n\n\n378\n\n\n\n\nTotal\n\n\n77\n\n\n523\n\n\n600\n\n\n\n\n\n600 patients with chest pain. Teal = correct, rose = error."
+  },
+  {
+    "objectID": "slides/lecture-01.html#two-directions-of-reading",
+    "href": "slides/lecture-01.html#two-directions-of-reading",
+    "title": "Diagnostic Test Accuracy",
+    "section": "Two directions of reading",
+    "text": "Two directions of reading\n\n\nDown the columns\n\\[\\text{Sens} = \\frac{TP}{TP+FN}\\] \\[\\text{Spec} = \\frac{TN}{TN+FP}\\]\nDescribes the test.\nIndependent of prevalence.\n\nAcross the rows\n\\[\\text{PPV} = \\frac{TP}{TP+FP}\\] \\[\\text{NPV} = \\frac{TN}{TN+FN}\\]\nDescribes this population.\nMoves with prevalence."
+  },
+  {
+    "objectID": "slides/lecture-01.html#the-numbers-here",
+    "href": "slides/lecture-01.html#the-numbers-here",
+    "title": "Diagnostic Test Accuracy",
+    "section": "The numbers here",
+    "text": "The numbers here\n\nsens &lt;- tab$tp / (tab$tp + tab$fn)\nspec &lt;- tab$tn / (tab$tn + tab$fp)\nppv  &lt;- tab$tp / (tab$tp + tab$fp)\n\nround(c(sensitivity = sens, specificity = spec, ppv = ppv), 3)\n\nsensitivity specificity         ppv \n      0.961       0.717       0.333 \n\n\n\nSensitivity 96.1%, but the probability of infarction given a positive result is 33.3%.\nThese are different questions."
+  },
+  {
+    "objectID": "slides/lecture-01.html#the-prevalence-trap",
+    "href": "slides/lecture-01.html#the-prevalence-trap",
+    "title": "Diagnostic Test Accuracy",
+    "section": "The prevalence trap",
+    "text": "The prevalence trap\n\nSame assay. Same cut-off. Same sensitivity and specificity.\nOnly the population changed."
+  },
+  {
+    "objectID": "slides/lecture-01.html#what-this-means-in-practice",
+    "href": "slides/lecture-01.html#what-this-means-in-practice",
+    "title": "Diagnostic Test Accuracy",
+    "section": "What this means in practice",
+    "text": "What this means in practice\n\n\nA positive troponin in the coronary care unit is strong evidence\nThe same result in a low-risk outpatient is more likely a false alarm\nOrdering a test on a patient with a very low pre-test probability generates noise, not information\nThe threshold is a value judgement about which error you prefer"
+  },
+  {
+    "objectID": "slides/lecture-01.html#likelihood-ratios-travel",
+    "href": "slides/lecture-01.html#likelihood-ratios-travel",
+    "title": "Diagnostic Test Accuracy",
+    "section": "Likelihood ratios travel",
+    "text": "Likelihood ratios travel\n\\[\\text{post-test odds} = \\text{pre-test odds} \\times LR\\]\n\nlr_pos &lt;- m$sensitivity / (1 - m$specificity)\n\npre &lt;- 0.25\nodds &lt;- pre / (1 - pre) * lr_pos\nodds / (1 + odds)\n\n[1] 0.5309645\n\n\nWorks from any starting probability, in any setting (Deeks and Altman 2004)."
+  },
+  {
+    "objectID": "slides/lecture-01.html#summary",
+    "href": "slides/lecture-01.html#summary",
+    "title": "Diagnostic Test Accuracy",
+    "section": "Summary",
+    "text": "Summary\n\nNo reference standard, no accuracy\nSensitivity and specificity describe the test\nPredictive values describe the population\nLikelihood ratios connect the two\nThe threshold encodes what you are willing to get wrong"
+  },
+  {
+    "objectID": "slides/lecture-01.html#continue-online",
+    "href": "slides/lecture-01.html#continue-online",
+    "title": "Diagnostic Test Accuracy",
+    "section": "Continue online",
+    "text": "Continue online\nThe full course, with runnable code and self-assessment:\n\nOpen the course\n\n\nPress ? for keyboard shortcuts · F for fullscreen · E for export to PDF\n\n\n\n\nDiagnostic Test Accuracy · CC BY 4.0\n\n\n\n\nDeeks, Jonathan J., and Douglas G. Altman. 2004. “Diagnostic Tests 4: Likelihood Ratios.” BMJ 329 (7458): 168–69. https://doi.org/10.1136/bmj.329.7458.168."
+  },
+  {
+    "objectID": "02-sensitivity-specificity.html",
+    "href": "02-sensitivity-specificity.html",
+    "title": "Sensitivity and Specificity",
+    "section": "",
+    "text": "In this chapter\n\nDerive sensitivity and specificity and identify their denominators\nAttach a confidence interval to each and explain why it is often wide\nUse SnNout and SpPin correctly, and know when they mislead\nExplain why these two measures alone cannot interpret a patient’s result\n\n\nSensitivity and specificity split the 2×2 table down its columns. Each asks about a group of patients defined by whether they have the disease.\nSensitivity asks: among patients who do have the disease, what proportion does the test detect?\n\\[\n\\text{Sensitivity} = \\frac{TP}{TP + FN}\n\\]\nSpecificity asks: among patients who do not have the disease, what proportion does the test correctly clear?\n\\[\n\\text{Specificity} = \\frac{TN}{TN + FP}\n\\]\nBoth denominators are column totals. Neither involves the number of patients the test called positive, and neither depends on how common the disease is. This is the property that makes them portable between settings — and, as Chapter 3 shows, the property that makes them nearly useless at the bedside on their own.",
+    "crumbs": [
+      "Course",
+      "Foundations",
+      "Sensitivity and Specificity"
+    ]
+  },
+  {
+    "objectID": "02-sensitivity-specificity.html#sec-sensspec",
+    "href": "02-sensitivity-specificity.html#sec-sensspec",
+    "title": "Sensitivity and Specificity",
+    "section": "",
+    "text": "In this chapter\n\nDerive sensitivity and specificity and identify their denominators\nAttach a confidence interval to each and explain why it is often wide\nUse SnNout and SpPin correctly, and know when they mislead\nExplain why these two measures alone cannot interpret a patient’s result\n\n\nSensitivity and specificity split the 2×2 table down its columns. Each asks about a group of patients defined by whether they have the disease.\nSensitivity asks: among patients who do have the disease, what proportion does the test detect?\n\\[\n\\text{Sensitivity} = \\frac{TP}{TP + FN}\n\\]\nSpecificity asks: among patients who do not have the disease, what proportion does the test correctly clear?\n\\[\n\\text{Specificity} = \\frac{TN}{TN + FP}\n\\]\nBoth denominators are column totals. Neither involves the number of patients the test called positive, and neither depends on how common the disease is. This is the property that makes them portable between settings — and, as Chapter 3 shows, the property that makes them nearly useless at the bedside on their own.",
+    "crumbs": [
+      "Course",
+      "Foundations",
+      "Sensitivity and Specificity"
+    ]
+  },
+  {
+    "objectID": "02-sensitivity-specificity.html#computing-them",
+    "href": "02-sensitivity-specificity.html#computing-them",
+    "title": "Sensitivity and Specificity",
+    "section": "2 Computing them",
+    "text": "2 Computing them\n\nsensitivity &lt;- tab$tp / (tab$tp + tab$fn)\nspecificity &lt;- tab$tn / (tab$tn + tab$fp)\n\nc(sensitivity = round(sensitivity, 3),\n  specificity = round(specificity, 3))\n\nsensitivity specificity \n      0.961       0.717 \n\n\nIn our cohort the troponin threshold of 14 ng/L detects 96.1% of confirmed infarctions and correctly clears 71.7% of those without one.\n\n\n\n\n\n\nSanity check\n\n\n\n74 true positives divided by 77 patients with confirmed MI gives 0.961. If a calculated sensitivity ever exceeds 1, you have used a row total as the denominator.",
+    "crumbs": [
+      "Course",
+      "Foundations",
+      "Sensitivity and Specificity"
+    ]
+  },
+  {
+    "objectID": "02-sensitivity-specificity.html#a-point-estimate-is-not-enough",
+    "href": "02-sensitivity-specificity.html#a-point-estimate-is-not-enough",
+    "title": "Sensitivity and Specificity",
+    "section": "3 A point estimate is not enough",
+    "text": "3 A point estimate is not enough\nBoth measures are proportions estimated from a sample, so both carry uncertainty. The denominator for sensitivity is only the diseased patients — here 77 of 600 — so the interval around it is usually much wider than the one around specificity.\n\n1sens_ci &lt;- dtx_ci(tab$tp, tab$tp + tab$fn)\nspec_ci &lt;- dtx_ci(tab$tn, tab$tn + tab$fp)\n\nround(rbind(sensitivity = c(est = sensitivity, lower = sens_ci[1], upper = sens_ci[2]),\n            specificity = c(est = specificity, lower = spec_ci[1], upper = spec_ci[2])), 3)\n\n\n1\n\nWilson score intervals. Preferred to the normal approximation because these proportions sit close to 1 and the denominators are small — see (Newcombe 1998).\n\n\n\n\n              est lower upper\nsensitivity 0.961 0.892 0.987\nspecificity 0.717 0.677 0.754\n\n\n\n\n\n\n\n\n\n\nFigure 1: Point estimates with 95% Wilson intervals. The interval for sensitivity is wider because it rests on far fewer patients.\n\n\n\n\n\nReporting sensitivity as a bare percentage hides this. A test described as “92% sensitive” from a study of 25 diseased patients is compatible with a true sensitivity below 75%.",
+    "crumbs": [
+      "Course",
+      "Foundations",
+      "Sensitivity and Specificity"
+    ]
+  },
+  {
+    "objectID": "02-sensitivity-specificity.html#snnout-and-sppin",
+    "href": "02-sensitivity-specificity.html#snnout-and-sppin",
+    "title": "Sensitivity and Specificity",
+    "section": "4 SnNout and SpPin",
+    "text": "4 SnNout and SpPin\nTwo mnemonics from evidence-based medicine, useful when their conditions hold:\n\nSnNout — with a highly Snsitive test, a Negative result rules the diagnosis out\nSpPin — with a highly Specific test, a Positive result rules it in\n\nThe logic is sound. A test that almost never misses the disease produces few false negatives, so a negative result is informative.\n\n\n\n\n\n\nWhere these mnemonics fail\n\n\n\nBoth are shortcuts around Bayes’ theorem, and both quietly assume the pre-test probability is not extreme. A 99% sensitive test does not rule out a disease in a patient whose pre-test probability was 90% to begin with — a negative result leaves them well above the threshold at which you would act. Use the mnemonics to build intuition, not to make decisions. Chapter 3 gives the arithmetic that always works.",
+    "crumbs": [
+      "Course",
+      "Foundations",
+      "Sensitivity and Specificity"
+    ]
+  },
+  {
+    "objectID": "02-sensitivity-specificity.html#why-neither-answers-your-patients-question",
+    "href": "02-sensitivity-specificity.html#why-neither-answers-your-patients-question",
+    "title": "Sensitivity and Specificity",
+    "section": "5 Why neither answers your patient’s question",
+    "text": "5 Why neither answers your patient’s question\nYour patient does not ask “if I had an infarction, would this test have caught it?” They ask “I have a positive result — do I have an infarction?”\nThat reverses the conditioning. Sensitivity is \\(P(\\text{test}^+ \\mid \\text{disease})\\); the question asks for \\(P(\\text{disease} \\mid \\text{test}^+)\\). These are different quantities and confusing them is the prosecutor’s fallacy (Altman and Bland 1994).\nIn our cohort sensitivity is 96.1%, but the probability that a patient with a positive troponin actually infarcted is 33.3% — a very different number, and it depends on something sensitivity deliberately ignores.",
+    "crumbs": [
+      "Course",
+      "Foundations",
+      "Sensitivity and Specificity"
+    ]
+  },
+  {
+    "objectID": "02-sensitivity-specificity.html#check-yourself",
+    "href": "02-sensitivity-specificity.html#check-yourself",
+    "title": "Sensitivity and Specificity",
+    "section": "6 Check yourself",
+    "text": "6 Check yourself\n\nA screening test has sensitivity 0.95 and specificity 0.80. It is moved from a hospital population to a community population where the disease is ten times rarer. What happens to the sensitivity?\n\nIt falls, because there are fewer cases to detect\nIt stays approximately the same, provided the spectrum of disease is similar\nIt rises, because there are fewer false positives\nIt cannot be calculated in the new setting\n\n\nSensitivity is conditional on having the disease, so changing how many people have it does not change the proportion detected. The caveat is real though: if the community cases are milder than the hospital cases, sensitivity can genuinely fall — that is spectrum bias, not a prevalence effect.\n\n\n\nWhich single change would most reduce the number of false negatives?\n\nLowering the troponin threshold below 14 ng/L\nRaising the troponin threshold above 14 ng/L\nTesting more patients\nUsing a stricter reference standard\n\n\nLowering the threshold calls more patients positive, so fewer diseased patients are missed: sensitivity rises. The price is more false positives and lower specificity. Chapter 4 traces that trade-off across every possible threshold.",
+    "crumbs": [
+      "Course",
+      "Foundations",
+      "Sensitivity and Specificity"
+    ]
+  },
+  {
+    "objectID": "references.html",
+    "href": "references.html",
+    "title": "References and Further Reading",
+    "section": "",
+    "text": "The BMJ “Diagnostic tests” series by Altman and Bland remains the clearest short introduction to the subject, and is worth reading in full before anything longer (Altman and Bland 1994a, 1994b; Deeks and Altman 2004).\nFor anyone appraising or designing a diagnostic accuracy study, STARD sets out what must be reported (Bossuyt et al. 2015) and QUADAS-2 gives the framework for judging risk of bias (Whiting et al. 2011). The clinical definitions used throughout come from the fourth universal definition of myocardial infarction (Thygesen et al. 2019). The interpretation of the area under the ROC curve follows Hanley and McNeil (Hanley and McNeil 1982), and the confidence intervals use the methods compared by Newcombe (Newcombe 1998).\n\n\nAltman, Douglas G., and J. Martin Bland. 1994a. “Diagnostic Tests 1: Sensitivity and Specificity.” BMJ 308 (6943): 1552. https://doi.org/10.1136/bmj.308.6943.1552.\n\n\n———. 1994b. “Diagnostic Tests 2: Predictive Values.” BMJ 309 (6947): 102. https://doi.org/10.1136/bmj.309.6947.102.\n\n\nBossuyt, Patrick M., Johannes B. Reitsma, David E. Bruns, Constantine A. Gatsonis, Paul P. Glasziou, Les Irwig, Jeroen G. Lijmer, et al. 2015. “STARD 2015: An Updated List of Essential Items for Reporting Diagnostic Accuracy Studies.” BMJ 351: h5527. https://doi.org/10.1136/bmj.h5527.\n\n\nDeeks, Jonathan J., and Douglas G. Altman. 2004. “Diagnostic Tests 4: Likelihood Ratios.” BMJ 329 (7458): 168–69. https://doi.org/10.1136/bmj.329.7458.168.\n\n\nHanley, James A., and Barbara J. McNeil. 1982. “The Meaning and Use of the Area Under a Receiver Operating Characteristic (ROC) Curve.” Radiology 143 (1): 29–36. https://doi.org/10.1148/radiology.143.1.7063747.\n\n\nNewcombe, Robert G. 1998. “Two-Sided Confidence Intervals for the Single Proportion: Comparison of Seven Methods.” Statistics in Medicine 17 (8): 857–72. https://doi.org/10.1002/(SICI)1097-0258(19980430)17:8&lt;857::AID-SIM777&gt;3.0.CO;2-E.\n\n\nThygesen, Kristian, Joseph S. Alpert, Allan S. Jaffe, Bernard R. Chaitman, Jeroen J. Bax, David A. Morrow, and Harvey D. White. 2019. “Fourth Universal Definition of Myocardial Infarction (2018).” European Heart Journal 40 (3): 237–69. https://doi.org/10.1093/eurheartj/ehy462.\n\n\nWhiting, Penny F., Anne W. S. Rutjes, Marie E. Westwood, Susan Mallett, Jonathan J. Deeks, Johannes B. Reitsma, Mariska M. G. Leeflang, Jonathan A. C. Sterne, and Patrick M. M. Bossuyt. 2011. “QUADAS-2: A Revised Tool for the Quality Assessment of Diagnostic Accuracy Studies.” Annals of Internal Medicine 155 (8): 529–36. https://doi.org/10.7326/0003-4819-155-8-201110180-00009.",
+    "crumbs": [
+      "Course",
+      "Reference",
+      "References and Further Reading"
+    ]
+  },
+  {
+    "objectID": "references.html#cited-in-this-course",
+    "href": "references.html#cited-in-this-course",
+    "title": "References and Further Reading",
+    "section": "",
+    "text": "The BMJ “Diagnostic tests” series by Altman and Bland remains the clearest short introduction to the subject, and is worth reading in full before anything longer (Altman and Bland 1994a, 1994b; Deeks and Altman 2004).\nFor anyone appraising or designing a diagnostic accuracy study, STARD sets out what must be reported (Bossuyt et al. 2015) and QUADAS-2 gives the framework for judging risk of bias (Whiting et al. 2011). The clinical definitions used throughout come from the fourth universal definition of myocardial infarction (Thygesen et al. 2019). The interpretation of the area under the ROC curve follows Hanley and McNeil (Hanley and McNeil 1982), and the confidence intervals use the methods compared by Newcombe (Newcombe 1998).\n\n\nAltman, Douglas G., and J. Martin Bland. 1994a. “Diagnostic Tests 1: Sensitivity and Specificity.” BMJ 308 (6943): 1552. https://doi.org/10.1136/bmj.308.6943.1552.\n\n\n———. 1994b. “Diagnostic Tests 2: Predictive Values.” BMJ 309 (6947): 102. https://doi.org/10.1136/bmj.309.6947.102.\n\n\nBossuyt, Patrick M., Johannes B. Reitsma, David E. Bruns, Constantine A. Gatsonis, Paul P. Glasziou, Les Irwig, Jeroen G. Lijmer, et al. 2015. “STARD 2015: An Updated List of Essential Items for Reporting Diagnostic Accuracy Studies.” BMJ 351: h5527. https://doi.org/10.1136/bmj.h5527.\n\n\nDeeks, Jonathan J., and Douglas G. Altman. 2004. “Diagnostic Tests 4: Likelihood Ratios.” BMJ 329 (7458): 168–69. https://doi.org/10.1136/bmj.329.7458.168.\n\n\nHanley, James A., and Barbara J. McNeil. 1982. “The Meaning and Use of the Area Under a Receiver Operating Characteristic (ROC) Curve.” Radiology 143 (1): 29–36. https://doi.org/10.1148/radiology.143.1.7063747.\n\n\nNewcombe, Robert G. 1998. “Two-Sided Confidence Intervals for the Single Proportion: Comparison of Seven Methods.” Statistics in Medicine 17 (8): 857–72. https://doi.org/10.1002/(SICI)1097-0258(19980430)17:8&lt;857::AID-SIM777&gt;3.0.CO;2-E.\n\n\nThygesen, Kristian, Joseph S. Alpert, Allan S. Jaffe, Bernard R. Chaitman, Jeroen J. Bax, David A. Morrow, and Harvey D. White. 2019. “Fourth Universal Definition of Myocardial Infarction (2018).” European Heart Journal 40 (3): 237–69. https://doi.org/10.1093/eurheartj/ehy462.\n\n\nWhiting, Penny F., Anne W. S. Rutjes, Marie E. Westwood, Susan Mallett, Jonathan J. Deeks, Johannes B. Reitsma, Mariska M. G. Leeflang, Jonathan A. C. Sterne, and Patrick M. M. Bossuyt. 2011. “QUADAS-2: A Revised Tool for the Quality Assessment of Diagnostic Accuracy Studies.” Annals of Internal Medicine 155 (8): 529–36. https://doi.org/10.7326/0003-4819-155-8-201110180-00009.",
+    "crumbs": [
+      "Course",
+      "Reference",
+      "References and Further Reading"
+    ]
+  },
+  {
+    "objectID": "references.html#suggested-next-steps",
+    "href": "references.html#suggested-next-steps",
+    "title": "References and Further Reading",
+    "section": "Suggested next steps",
+    "text": "Suggested next steps\nFor teaching colleagues who want to extend this material:\n\nDiagnostic meta-analysis — pooling sensitivity and specificity across studies requires bivariate models, because the two measures are negatively correlated through the threshold.\nMultiple tests in sequence — how likelihood ratios combine when tests are conditionally independent, and what goes wrong when they are not.\nNet benefit and decision curve analysis — a formal extension of the cost-weighting shown in Chapter 4.\nPrediction models — calibration, discrimination and the difference between a good model and a useful one.",
+    "crumbs": [
+      "Course",
+      "Reference",
+      "References and Further Reading"
+    ]
+  },
+  {
+    "objectID": "references.html#reusing-this-course",
+    "href": "references.html#reusing-this-course",
+    "title": "References and Further Reading",
+    "section": "Reusing this course",
+    "text": "Reusing this course\nReleased under a Creative Commons Attribution 4.0 licence. You may copy, adapt and re-host the material, including commercially, provided you credit the original. The source files, including every line of R that produced the figures, are in the repository linked in the page footer.",
+    "crumbs": [
+      "Course",
+      "Reference",
+      "References and Further Reading"
+    ]
+  },
+  {
+    "objectID": "06-self-assessment.html",
+    "href": "06-self-assessment.html",
+    "title": "Self-Assessment",
+    "section": "",
+    "text": "Work through these without looking back. Your score updates as you go; nothing is recorded or sent anywhere.",
+    "crumbs": [
+      "Course",
+      "Practice",
+      "Self-Assessment"
+    ]
+  },
+  {
+    "objectID": "06-self-assessment.html#section-a-building-the-table",
+    "href": "06-self-assessment.html#section-a-building-the-table",
+    "title": "Self-Assessment",
+    "section": "1 Section A — building the table",
+    "text": "1 Section A — building the table\n\nA reference standard is best described as:\n\nThe test that is cheapest to perform\nThe best available method for determining whether the target condition is present\nThe test with the highest sensitivity\nThe result recorded in the patient’s notes\n\n\nIt is the comparator we are willing to treat as truth. It is rarely perfect, which is why “gold standard” has largely been abandoned as a term.\n\n\n\nIn a 2×2 table with the reference standard in columns, sensitivity is calculated using:\n\nThe top row\nThe left-hand column\nThe bottom row\nThe whole table\n\n\nSensitivity is TP / (TP + FN) — both cells of the disease-present column. Predictive values read across rows; sensitivity and specificity read down columns.\n\n\n\nA study gives the reference standard only to patients whose index test was positive. This produces:\n\nPartial verification bias, inflating sensitivity\nSpectrum bias, deflating specificity\nIncorporation bias, inflating specificity\nNo bias, provided the sample is large enough\n\n\nWithout reference-standard results in test-negative patients, the false-negative cell is incomplete and sensitivity is overstated. Common when the reference standard is invasive.",
+    "crumbs": [
+      "Course",
+      "Practice",
+      "Self-Assessment"
+    ]
+  },
+  {
+    "objectID": "06-self-assessment.html#section-b-calculating-measures",
+    "href": "06-self-assessment.html#section-b-calculating-measures",
+    "title": "Self-Assessment",
+    "section": "2 Section B — calculating measures",
+    "text": "2 Section B — calculating measures\nUse the cohort figures: TP = 74, FP = 148, FN = 3, TN = 375. Enter answers as decimals to two places; the box turns teal when you are within tolerance.\nSensitivity is ? and specificity is ?.\nThe positive predictive value is ? and the prevalence in this cohort is ?.\n\nWhy is a Wilson interval preferred to the normal approximation for sensitivity?\n\nIt is easier to calculate by hand\nIt behaves properly when the proportion is near 1 or the denominator is small\nIt gives narrower intervals, which are more precise\nIt is required by the STARD statement\n\n\nThe normal approximation can produce intervals extending beyond 1, or absurdly narrow ones, exactly where diagnostic accuracy estimates usually sit. Narrower is not better if the coverage is wrong.\n\n\n\nA test has sensitivity 0.80 and specificity 0.90. Its positive likelihood ratio is:\n\n0.89\n4.0\n8.0\n0.22\n\n\nLR⁺ = sensitivity / (1 − specificity) = 0.80 / 0.10 = 8.0. The 0.22 is the negative likelihood ratio, (1 − 0.80) / 0.90.",
+    "crumbs": [
+      "Course",
+      "Practice",
+      "Self-Assessment"
+    ]
+  },
+  {
+    "objectID": "06-self-assessment.html#section-c-prevalence-and-bayes",
+    "href": "06-self-assessment.html#section-c-prevalence-and-bayes",
+    "title": "Self-Assessment",
+    "section": "3 Section C — prevalence and Bayes",
+    "text": "3 Section C — prevalence and Bayes\n\nWhich quantities change when the same test is moved to a population where the disease is rarer?\n\nSensitivity and specificity\nPositive and negative predictive value\nLikelihood ratios\nThe area under the ROC curve\n\n\nSensitivity, specificity, likelihood ratios and AUC all describe the test and are independent of prevalence. Predictive values describe what a result means in a given population, and move with it.\n\n\n\nA patient’s pre-test probability is 40%. A test with a negative likelihood ratio of 0.1 comes back negative. The post-test probability is closest to:\n\n4%\n6%\n10%\n25%\n\n\nPre-test odds = 0.4/0.6 = 0.667. Post-test odds = 0.667 × 0.1 = 0.0667. Probability = 0.0667/1.0667 = 0.063, about 6%. The intuitive answer of 4% comes from multiplying the probability directly, which is the error the odds conversion exists to prevent.\n\n\n\nScreening a low-prevalence population with a highly accurate test typically produces:\n\nFew false positives, because the test is accurate\nMany false positives relative to true positives, because most people tested are healthy\nReduced sensitivity\nAn improved positive predictive value\n\n\nThe false positives come from the large healthy majority. Even a 1% false positive rate applied to hundreds of thousands of healthy people swamps the small number of genuine cases. This is the central difficulty in every screening programme.",
+    "crumbs": [
+      "Course",
+      "Practice",
+      "Self-Assessment"
+    ]
+  },
+  {
+    "objectID": "06-self-assessment.html#section-d-thresholds-and-roc",
+    "href": "06-self-assessment.html#section-d-thresholds-and-roc",
+    "title": "Self-Assessment",
+    "section": "4 Section D — thresholds and ROC",
+    "text": "4 Section D — thresholds and ROC\n\nLowering a diagnostic threshold will:\n\nIncrease sensitivity and decrease specificity\nIncrease both sensitivity and specificity\nIncrease specificity and decrease sensitivity\nLeave both unchanged but improve PPV\n\n\nMore patients are called positive, so fewer cases are missed and more healthy patients are wrongly flagged. Every point on an ROC curve is one such trade.\n\n\n\nThe area under the ROC curve represents:\n\nThe proportion of patients correctly classified\nThe probability that a random diseased patient scores higher than a random non-diseased patient\nThe best achievable sensitivity\nAccuracy at the optimal threshold\n\n\nIt is a threshold-free measure of discrimination, not of accuracy. A test can have an excellent AUC and still be useless at the cut-off you actually use, or in the population you actually serve.\n\n\n\nFor a rule-out test in the emergency department, where a missed infarction is far worse than a false alarm, the threshold should be set to:\n\nA low value, prioritising sensitivity\nA high value, prioritising specificity\nThe Youden index optimum\nThe assay manufacturer’s stated cut-off\n\n\nYouden weights the two errors equally, which is not the clinical reality here. When a false negative is many times more costly than a false positive, the optimum moves to a lower threshold — as the cost curves in Chapter 4 show.\n\n\n\nA colleague reports that a new biomarker has “94% accuracy”. What is the most useful next question?\n\nWhat was the sample size?\nWas the study randomised?\nWhat were the sensitivity, specificity and prevalence?\nWhat was the AUC?\n\n\nOverall accuracy is dominated by prevalence. In a population where 6% have the disease, a test that calls everyone negative achieves 94% accuracy while detecting nothing. Accuracy alone is close to uninterpretable without the components behind it.",
+    "crumbs": [
+      "Course",
+      "Practice",
+      "Self-Assessment"
+    ]
+  },
+  {
+    "objectID": "06-self-assessment.html#where-to-go-next",
+    "href": "06-self-assessment.html#where-to-go-next",
+    "title": "Self-Assessment",
+    "section": "5 Where to go next",
+    "text": "5 Where to go next\nIf several answers surprised you, the chapter each question came from is worth revisiting — Section C maps to Chapter 3 and Section D to Chapter 4. The glossary collects every term in one place, and the references point to the primary literature.",
+    "crumbs": [
+      "Course",
+      "Practice",
+      "Self-Assessment"
+    ]
+  },
+  {
+    "objectID": "index.html",
+    "href": "index.html",
+    "title": "Diagnostic Test Accuracy",
+    "section": "",
+    "text": "A 58-year-old man arrives in the emergency department with chest pain. His high-sensitivity troponin comes back at 22 ng/L, above the laboratory cut-off. Does he have a myocardial infarction?\nThe test does not answer that question. It shifts a probability. How far it shifts, and from where, is what this course is about.\nEverything below rests on one small table. In our teaching cohort of 600 patients presenting with chest pain, 77 were eventually confirmed to have had an infarction. Comparing the troponin result against that final diagnosis gives:\nTwo cells the test got right, in teal. Two it got wrong, in rose. Every measure in this course — sensitivity, specificity, predictive values, likelihood ratios, the ROC curve — is a ratio built from those four numbers. That colour convention holds on every page, so you can always see at a glance which part of the table a formula is reading.",
+    "crumbs": [
+      "Course",
+      "Diagnostic Test Accuracy"
+    ]
+  },
+  {
+    "objectID": "index.html#how-this-course-works",
+    "href": "index.html#how-this-course-works",
+    "title": "Diagnostic Test Accuracy",
+    "section": "How this course works",
+    "text": "How this course works\nEach chapter mixes explanation, worked calculation and practice. The code that produces every number and figure is shown on the page — you can read it, copy it, and run it on your own data. Nothing is hidden in a spreadsheet.\n\n\n\n\n\n\nflowchart TD\n    A[\"Chapter 1&lt;br/&gt;The 2×2 table\"] --&gt; B[\"Chapter 2&lt;br/&gt;Sensitivity &amp; specificity\"]\n    B --&gt; C[\"Chapter 3&lt;br/&gt;Predictive values&lt;br/&gt;and Bayes\"]\n    B --&gt; D[\"Chapter 4&lt;br/&gt;Thresholds and ROC\"]\n    C --&gt; E[\"Chapter 5&lt;br/&gt;Case studies\"]\n    D --&gt; E\n    E --&gt; F[\"Chapter 6&lt;br/&gt;Self-assessment\"]\n\n    classDef found fill:#dcecea,stroke:#146b6b,stroke-width:1.5px,color:#12303a\n    classDef apply fill:#f9eed6,stroke:#a8700f,stroke-width:1.5px,color:#12303a\n    classDef prac  fill:#f4e2e0,stroke:#a6423d,stroke-width:1.5px,color:#12303a\n    class A,B found\n    class C,D apply\n    class E,F prac\n\n\n\n\nFigure 1: Route through the material. The two Foundations chapters are prerequisites for everything after them.\n\n\n\n\n\nWork through the chapters in order the first time. Afterwards each one stands alone as a reference.",
+    "crumbs": [
+      "Course",
+      "Diagnostic Test Accuracy"
+    ]
+  },
+  {
+    "objectID": "index.html#try-it-now",
+    "href": "index.html#try-it-now",
+    "title": "Diagnostic Test Accuracy",
+    "section": "Try it now",
+    "text": "Try it now\nEvery chapter ends with questions like this one. Choose an answer and the page tells you whether you were right and why.\n\nIn the table above, the 3 patients in the lower-left cell are those whose troponin was below the cut-off but who turned out to have had an infarction. What are they called?\n\nFalse positives\nFalse negatives\nTrue negatives\nThey are excluded from the analysis\n\n\nThey are false negatives: the test was negative, the disease was present. These are usually the errors that matter most clinically, because the patient is reassured and sent home. Chapter 4 looks at how lowering the threshold trades false negatives away in exchange for more false positives.",
+    "crumbs": [
+      "Course",
+      "Diagnostic Test Accuracy"
+    ]
+  },
+  {
+    "objectID": "index.html#before-you-start",
+    "href": "index.html#before-you-start",
+    "title": "Diagnostic Test Accuracy",
+    "section": "Before you start",
+    "text": "Before you start\n\n\n\n\n\n\nWhat you need\n\n\n\nThe course reads perfectly well in a browser with no software installed. To run the code yourself you need R, RStudio and the knitr package. No other packages are required — everything uses base R.\n\n\n\n\n\n\n\n\nAbout the data\n\n\n\nThe 600-patient cohort used throughout is simulated. It behaves like a real chest-pain population and is fine for learning, but no clinical conclusion should be drawn from it. You can download the dataset and work with it directly.",
+    "crumbs": [
+      "Course",
+      "Diagnostic Test Accuracy"
+    ]
+  },
+  {
+    "objectID": "index.html#reusing-this-course",
+    "href": "index.html#reusing-this-course",
+    "title": "Diagnostic Test Accuracy",
+    "section": "Reusing this course",
+    "text": "Reusing this course\nThe material is published under CC BY 4.0. You are free to copy it, adapt it for your own teaching and re-host it, provided you credit the source. The full source files are in the repository linked in the footer.",
+    "crumbs": [
+      "Course",
+      "Diagnostic Test Accuracy"
+    ]
+  },
+  {
+    "objectID": "01-two-by-two.html",
+    "href": "01-two-by-two.html",
+    "title": "The 2×2 Table",
+    "section": "",
+    "text": "In this chapter\n\nTurn a continuous measurement into a binary test result\nBuild a 2×2 table against a reference standard\nName all four cells and both margins without hesitating\nRecognise the three errors that most often corrupt such a table",
+    "crumbs": [
+      "Course",
+      "Foundations",
+      "The 2×2 Table"
+    ]
+  },
+  {
+    "objectID": "01-two-by-two.html#the-reference-standard-comes-first",
+    "href": "01-two-by-two.html#the-reference-standard-comes-first",
+    "title": "The 2×2 Table",
+    "section": "1 The reference standard comes first",
+    "text": "1 The reference standard comes first\nA diagnostic test is never assessed on its own. It is compared against something we are prepared to treat as the truth — the reference standard.1 For myocardial infarction that is the Fourth Universal Definition: a rise or fall in cardiac troponin together with clinical evidence of ischaemia (Thygesen et al. 2019).\nThis ordering matters. If you have no reference standard, you have no 2×2 table and no accuracy to measure — only agreement between two fallible measurements, which is a different question entirely.",
+    "crumbs": [
+      "Course",
+      "Foundations",
+      "The 2×2 Table"
+    ]
+  },
+  {
+    "objectID": "01-two-by-two.html#our-teaching-cohort",
+    "href": "01-two-by-two.html#our-teaching-cohort",
+    "title": "The 2×2 Table",
+    "section": "2 Our teaching cohort",
+    "text": "2 Our teaching cohort\nThe dataset holds one row per patient presenting with chest pain.\n\n\nCode\ncohort &lt;- read.csv(\"data/chest_pain_cohort.csv\")\nstr(cohort)\n\n\n'data.frame':   600 obs. of  6 variables:\n $ patient_id       : chr  \"P001\" \"P002\" \"P003\" \"P004\" ...\n $ age              : int  65 57 55 75 74 71 62 73 42 44 ...\n $ sex              : chr  \"M\" \"F\" \"M\" \"M\" ...\n $ hours_since_onset: num  1.2 1.7 3.8 2.6 5.8 6.8 3.2 2.2 11 11.3 ...\n $ troponin_ng_L    : num  8.1 7.9 4.7 18.5 4.8 ...\n $ mi_confirmed     : int  0 0 0 0 0 0 0 1 0 0 ...\n\n\n\n\n\n\nTable 1: The first six patients. mi_confirmed is the reference standard: 1 if an infarction was confirmed, 0 if it was excluded.\n\n\n\n\n\n\npatient_id\nage\nsex\nhours_since_onset\ntroponin_ng_L\nmi_confirmed\n\n\n\n\nP001\n65\nM\n1.2\n8.1\n0\n\n\nP002\n57\nF\n1.7\n7.9\n0\n\n\nP003\n55\nM\n3.8\n4.7\n0\n\n\nP004\n75\nM\n2.6\n18.5\n0\n\n\nP005\n74\nM\n5.8\n4.8\n0\n\n\nP006\n71\nF\n6.8\n5.1\n0\n\n\n\n\n\n\n\n\nNote what each column is doing. troponin_ng_L is the index test, the thing being evaluated. mi_confirmed is the reference standard. The remaining columns are patient characteristics we will use later to see whether accuracy holds up in different subgroups.",
+    "crumbs": [
+      "Course",
+      "Foundations",
+      "The 2×2 Table"
+    ]
+  },
+  {
+    "objectID": "01-two-by-two.html#turning-a-measurement-into-a-result",
+    "href": "01-two-by-two.html#turning-a-measurement-into-a-result",
+    "title": "The 2×2 Table",
+    "section": "3 Turning a measurement into a result",
+    "text": "3 Turning a measurement into a result\nTroponin is continuous. A 2×2 table needs a yes or a no. So we impose a threshold — here the conventional 99th-percentile upper reference limit of 14 ng/L.\n\n1threshold &lt;- 14\n2cohort$test_positive &lt;- cohort$troponin_ng_L &gt;= threshold\n\n3table(cohort$test_positive)\n\n\n1\n\nThe cut-off, in ng/L. Changing this single number changes every measure in the course — which is the whole subject of Chapter 4.\n\n2\n\n&gt;= produces TRUE or FALSE for each patient.\n\n3\n\nA quick sanity check before going further.\n\n\n\n\n\nFALSE  TRUE \n  378   222 \n\n\n\n\n\n\n\n\nThe threshold is a decision, not a fact\n\n\n\nNothing in the biology of troponin makes 14 ng/L the right number. It is a choice about how willing we are to be wrong in each direction, and a different choice would give a different test. Treating a cut-off as though it were inherent to the assay is one of the commonest conceptual errors in diagnostic reasoning.",
+    "crumbs": [
+      "Course",
+      "Foundations",
+      "The 2×2 Table"
+    ]
+  },
+  {
+    "objectID": "01-two-by-two.html#building-the-table",
+    "href": "01-two-by-two.html#building-the-table",
+    "title": "The 2×2 Table",
+    "section": "4 Building the table",
+    "text": "4 Building the table\nWith both variables binary, the table follows directly.\n\nBase RCounting each cellCourse helper\n\n\n\nraw &lt;- table(\n  Test  = factor(cohort$test_positive, c(TRUE, FALSE), c(\"Positive\", \"Negative\")),\n  Truth = factor(cohort$mi_confirmed,  c(1, 0),        c(\"MI\", \"No MI\"))\n)\nraw\n\n          Truth\nTest        MI No MI\n  Positive  74   148\n  Negative   3   375\n\n\n\n\n\ntp &lt;- sum( cohort$test_positive &  cohort$mi_confirmed == 1)\nfp &lt;- sum( cohort$test_positive &  cohort$mi_confirmed == 0)\nfn &lt;- sum(!cohort$test_positive &  cohort$mi_confirmed == 1)\ntn &lt;- sum(!cohort$test_positive &  cohort$mi_confirmed == 0)\n\nc(TP = tp, FP = fp, FN = fn, TN = tn)\n\n TP  FP  FN  TN \n 74 148   3 375 \n\n\n\n\n\ntab &lt;- dtx_table(cohort$test_positive, cohort$mi_confirmed)\nstr(tab)\n\nList of 5\n $ tp: int 74\n $ fp: int 148\n $ fn: int 3\n $ tn: int 375\n $ n : int 600\n\n\n\n\n\nAll three give the same four numbers. Displayed with the course convention:\n\n\n\n\n\n\nMI confirmed\n\n\nMI excluded\n\n\nTotal\n\n\n\n\n\n\nTest positive\n\n\n74true positive\n\n\n148false positive\n\n\n222\n\n\n\n\nTest negative\n\n\n3false negative\n\n\n375true negative\n\n\n378\n\n\n\n\nTotal\n\n\n77\n\n\n523\n\n\n600",
+    "crumbs": [
+      "Course",
+      "Foundations",
+      "The 2×2 Table"
+    ]
+  },
+  {
+    "objectID": "01-two-by-two.html#reading-the-table",
+    "href": "01-two-by-two.html#reading-the-table",
+    "title": "The 2×2 Table",
+    "section": "5 Reading the table",
+    "text": "5 Reading the table\nLearn these four names now; the rest of the course assumes them.\n\n\n\n\nTable 2: The four cells and what each represents clinically.\n\n\n\n\n\n\n\n\n\n\n\n\nCell\nTest\nDisease\nClinical consequence\n\n\n\n\nTrue positive (TP)\nPositive\nPresent\nCorrectly identified; treatment begins\n\n\nFalse positive (FP)\nPositive\nAbsent\nUnnecessary admission, further tests, anxiety\n\n\nFalse negative (FN)\nNegative\nPresent\nMissed diagnosis; patient discharged untreated\n\n\nTrue negative (TN)\nNegative\nAbsent\nCorrectly reassured and discharged\n\n\n\n\n\n\n\n\nThe margins matter too. The row totals are how many patients the test called positive or negative. The column totals are how many actually had the disease — 77 of 600 here, a prevalence of 12.8%.\n\nWhich way round?\nConvention puts the reference standard in columns and the test in rows. Sensitivity and specificity are then read down the columns, predictive values across the rows. If you fix that orientation in your mind now, you will never have to re-derive which denominator a formula wants.",
+    "crumbs": [
+      "Course",
+      "Foundations",
+      "The 2×2 Table"
+    ]
+  },
+  {
+    "objectID": "01-two-by-two.html#three-ways-this-table-goes-wrong",
+    "href": "01-two-by-two.html#three-ways-this-table-goes-wrong",
+    "title": "The 2×2 Table",
+    "section": "6 Three ways this table goes wrong",
+    "text": "6 Three ways this table goes wrong\n\n\n\n\n\n\nPartial verification bias\n\n\n\n\n\nOnly patients with a positive index test receive the reference standard. The FN and TN cells are then built from incomplete information, and sensitivity is inflated. Common wherever the reference standard is invasive, expensive or carries risk — coronary angiography being the obvious example here.\n\n\n\n\n\n\n\n\n\nIncorporation bias\n\n\n\n\n\nThe index test is itself part of the reference standard. Troponin appears in the universal definition of MI, so a troponin-based index test is partly being compared against itself, and accuracy is overstated. Rarely avoidable; it must be declared.\n\n\n\n\n\n\n\n\n\nSpectrum bias\n\n\n\n\n\nAccuracy is estimated in a population unlike the one where the test will be used — florid inpatient cases versus undifferentiated primary-care presentations. Sensitivity and specificity are stable across prevalence but not across case mix, a distinction Chapter 3 returns to. The STARD statement exists largely to make these design features visible (Bossuyt et al. 2015).",
+    "crumbs": [
+      "Course",
+      "Foundations",
+      "The 2×2 Table"
+    ]
+  },
+  {
+    "objectID": "01-two-by-two.html#check-yourself",
+    "href": "01-two-by-two.html#check-yourself",
+    "title": "The 2×2 Table",
+    "section": "7 Check yourself",
+    "text": "7 Check yourself\n\nA study enrols 500 patients. 60 have the disease. The test is positive in 48 of those 60, and positive in 35 of the remaining patients. How many true negatives are there?\n\n12\n35\n405\n452\n\n\nOf the 440 patients without the disease, 35 tested positive, so 440 − 35 = 405 tested negative and did not have the disease. The 12 is the false-negative count (60 − 48), and 452 is the total number of negative tests (405 + 12).\n\n\n\nA hospital introduces the same troponin assay in its outpatient chest-pain clinic, where far fewer patients turn out to have infarcted. Which of the following will change?\n\nSensitivity\nSpecificity\nThe positive predictive value\nNothing, provided the assay and cut-off are unchanged\n\n\nSensitivity and specificity are conditional on disease status and are unaffected by how common the disease is. Predictive values are conditional on the test result and depend directly on prevalence — which is why the same positive result means something different in the clinic than in resus. Chapter 3 works through the arithmetic.",
+    "crumbs": [
+      "Course",
+      "Foundations",
+      "The 2×2 Table"
+    ]
+  },
+  {
+    "objectID": "01-two-by-two.html#what-is-next",
+    "href": "01-two-by-two.html#what-is-next",
+    "title": "The 2×2 Table",
+    "section": "8 What is next",
+    "text": "8 What is next\nYou can now build the table. Chapter 2 turns it into the two measures that describe the test itself, and shows why neither one answers the question your patient is actually asking.",
+    "crumbs": [
+      "Course",
+      "Foundations",
+      "The 2×2 Table"
+    ]
+  },
+  {
+    "objectID": "01-two-by-two.html#footnotes",
+    "href": "01-two-by-two.html#footnotes",
+    "title": "The 2×2 Table",
+    "section": "Footnotes",
+    "text": "Footnotes\n\n\nOlder texts say “gold standard”. The term has fallen out of favour because it implies a perfection almost no clinical reference standard has. Most are themselves imperfect, which biases accuracy estimates in ways (Whiting et al. 2011) describes.↩︎",
+    "crumbs": [
+      "Course",
+      "Foundations",
+      "The 2×2 Table"
+    ]
+  },
+  {
+    "objectID": "glossary.html",
+    "href": "glossary.html",
+    "title": "Glossary",
+    "section": "",
+    "text": "Table 1: Accuracy measures. Note which are independent of prevalence: those describe the test itself and transfer between settings.\n\n\n\n\n\n\n\n\n\n\n\n\nTerm\nFormula\nAnswers the question\nPrevalence-dependent\n\n\n\n\nSensitivity\nTP / (TP + FN)\nOf those with the disease, how many are detected?\nNo\n\n\nSpecificity\nTN / (TN + FP)\nOf those without it, how many are correctly cleared?\nNo\n\n\nPositive predictive value (PPV)\nTP / (TP + FP)\nGiven a positive result, how likely is disease?\nYes\n\n\nNegative predictive value (NPV)\nTN / (TN + FN)\nGiven a negative result, how likely is absence?\nYes\n\n\nPositive likelihood ratio (LR+)\nSens / (1 - Spec)\nHow much does a positive result raise the odds?\nNo\n\n\nNegative likelihood ratio (LR-)\n(1 - Sens) / Spec\nHow much does a negative result lower the odds?\nNo\n\n\nAccuracy\n(TP + TN) / N\nWhat proportion of all results are correct?\nYes\n\n\nYouden index (J)\nSens + Spec - 1\nHow far above chance does the test perform?\nNo\n\n\nArea under the ROC curve (AUC)\n-\nHow well does the test rank diseased above non-diseased?\nNo\n\n\nPrevalence\n(TP + FN) / N\nHow common is the disease in this population?\n-",
+    "crumbs": [
+      "Course",
+      "Reference",
+      "Glossary"
+    ]
+  },
+  {
+    "objectID": "glossary.html#measures-of-test-performance",
+    "href": "glossary.html#measures-of-test-performance",
+    "title": "Glossary",
+    "section": "",
+    "text": "Table 1: Accuracy measures. Note which are independent of prevalence: those describe the test itself and transfer between settings.\n\n\n\n\n\n\n\n\n\n\n\n\nTerm\nFormula\nAnswers the question\nPrevalence-dependent\n\n\n\n\nSensitivity\nTP / (TP + FN)\nOf those with the disease, how many are detected?\nNo\n\n\nSpecificity\nTN / (TN + FP)\nOf those without it, how many are correctly cleared?\nNo\n\n\nPositive predictive value (PPV)\nTP / (TP + FP)\nGiven a positive result, how likely is disease?\nYes\n\n\nNegative predictive value (NPV)\nTN / (TN + FN)\nGiven a negative result, how likely is absence?\nYes\n\n\nPositive likelihood ratio (LR+)\nSens / (1 - Spec)\nHow much does a positive result raise the odds?\nNo\n\n\nNegative likelihood ratio (LR-)\n(1 - Sens) / Spec\nHow much does a negative result lower the odds?\nNo\n\n\nAccuracy\n(TP + TN) / N\nWhat proportion of all results are correct?\nYes\n\n\nYouden index (J)\nSens + Spec - 1\nHow far above chance does the test perform?\nNo\n\n\nArea under the ROC curve (AUC)\n-\nHow well does the test rank diseased above non-diseased?\nNo\n\n\nPrevalence\n(TP + FN) / N\nHow common is the disease in this population?\n-",
+    "crumbs": [
+      "Course",
+      "Reference",
+      "Glossary"
+    ]
+  },
+  {
+    "objectID": "glossary.html#the-four-cells",
+    "href": "glossary.html#the-four-cells",
+    "title": "Glossary",
+    "section": "The four cells",
+    "text": "The four cells\nTrue positive (TP) — test positive, disease present. Correct detection.\nFalse positive (FP) — test positive, disease absent. A false alarm, leading to unnecessary investigation, treatment and anxiety. Sometimes called a type I error.\nFalse negative (FN) — test negative, disease present. A missed diagnosis; usually the more dangerous error in acute medicine. Sometimes called a type II error.\nTrue negative (TN) — test negative, disease absent. Correct reassurance.",
+    "crumbs": [
+      "Course",
+      "Reference",
+      "Glossary"
+    ]
+  },
+  {
+    "objectID": "glossary.html#study-design-and-bias",
+    "href": "glossary.html#study-design-and-bias",
+    "title": "Glossary",
+    "section": "Study design and bias",
+    "text": "Study design and bias\nReference standard — the best available method for establishing whether the target condition is present. Replaces the older term “gold standard”, which implied a perfection few reference standards have.\nIndex test — the test being evaluated.\nPartial verification bias — the reference standard is applied only to patients with particular index test results, most often only the positives. The false-negative cell is then incomplete and sensitivity is inflated.\nIncorporation bias — the index test forms part of the reference standard, so the test is partly compared against itself. Accuracy is overstated.\nSpectrum bias — accuracy is estimated in a population whose severity mix differs from the population where the test will be used. Unlike prevalence effects, this genuinely changes sensitivity and specificity.\nSTARD — Standards for Reporting Diagnostic Accuracy studies, a checklist of items that must be reported for a reader to judge whether these biases are present (Bossuyt et al. 2015).\nQUADAS-2 — a tool for assessing risk of bias in diagnostic accuracy studies included in a systematic review (Whiting et al. 2011).",
+    "crumbs": [
+      "Course",
+      "Reference",
+      "Glossary"
+    ]
+  },
+  {
+    "objectID": "glossary.html#probability-and-inference",
+    "href": "glossary.html#probability-and-inference",
+    "title": "Glossary",
+    "section": "Probability and inference",
+    "text": "Probability and inference\nPre-test probability — the probability of disease before the test result is known, based on history, examination and setting. Also called prior probability.\nPost-test probability — the revised probability after incorporating the result. Also called posterior probability.\nOdds — probability divided by its complement, \\(p/(1-p)\\). Likelihood ratios multiply odds, not probabilities, which is why the conversion step cannot be skipped.\nBayes’ theorem — the rule relating pre-test to post-test probability. In its practical clinical form: post-test odds = pre-test odds × likelihood ratio.\nProsecutor’s fallacy — confusing \\(P(\\text{result} \\mid \\text{disease})\\) with \\(P(\\text{disease} \\mid \\text{result})\\); that is, treating sensitivity as though it were the positive predictive value.\nWilson score interval — a confidence interval for a proportion that behaves well near 0 and 1 and with small denominators, unlike the normal approximation (Newcombe 1998).",
+    "crumbs": [
+      "Course",
+      "Reference",
+      "Glossary"
+    ]
+  },
+  {
+    "objectID": "glossary.html#decision-making",
+    "href": "glossary.html#decision-making",
+    "title": "Glossary",
+    "section": "Decision-making",
+    "text": "Decision-making\nThreshold (cut-off) — the value above which a continuous measurement is called positive. A decision about the relative cost of each error, not a property of the assay.\nDecision threshold — the post-test probability at which management changes. A test is worth ordering only if a plausible result could carry the patient across one.\nSnNout — with a highly sensitive test, a negative result helps rule the diagnosis out. Fails when the pre-test probability is high.\nSpPin — with a highly specific test, a positive result helps rule it in. Fails when the pre-test probability is very low.\nROC curve — the plot of sensitivity against 1 − specificity across all possible thresholds (Hanley and McNeil 1982).",
+    "crumbs": [
+      "Course",
+      "Reference",
+      "Glossary"
+    ]
+  }
+]
