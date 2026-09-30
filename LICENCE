@@ -1,0 +1,29 @@
+# License
+
+Copyright © Universitätsmedizin Göttingen, Digitalisierungszentrum (DigiZ).
+All rights reserved.
+
+This repository and its contents — including but not limited to the course
+text, chapter structure, slides, quiz questions, corporate-design theme
+(`assets/`), and images/logo files (`images/`) — are proprietary. They are
+**not** licensed under an open-source or Creative Commons license.
+
+No part of this work may be copied, reproduced, redistributed, modified, or
+used to create derivative works, in whole or in part, without prior written
+permission from DigiZ.
+
+Third-party software bundled as part of the Quarto build output
+(`docs/site_libs/`) — including Bootstrap, reveal.js, clipboard.js, Mermaid,
+and related libraries — remains covered by its own respective open-source
+license (predominantly MIT; the default reveal.js theme fonts, League Gothic
+and Source Sans Pro, remain under the SIL Open Font License). Those licenses
+apply only to those specific third-party files and do not extend any rights
+to the course content itself.
+
+## Requesting permission to use this material
+
+Anyone wishing to use, adapt, or redistribute this course or any part of it
+should contact:
+
+**Digitalisierungszentrum (DigiZ)**
+Universitätsmedizin Göttingen
